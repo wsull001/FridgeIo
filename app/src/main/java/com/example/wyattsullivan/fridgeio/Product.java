@@ -7,12 +7,15 @@ import java.util.Date;
  */
 
 public class Product {
+
+    //TODO: add photo elements
     private String name;
     private Date expirationDate;
     private Date dateAdded;
     private String description;
     private int capacity;
     private int id;
+    private int fridgeID;
 
 
     public Product() {
@@ -21,6 +24,10 @@ public class Product {
         description = null;
         capacity = -1;
         id = -1;
+    }
+
+    public void setFridgeID(int fid) {
+        fridgeID = fid;
     }
 
     public void setExpirationDate(Date dt) {
@@ -68,5 +75,9 @@ public class Product {
     }
     public int getId() {
         return id;
+    }
+
+    public int getFridgeID() {
+        return fridgeID;
     }
 }

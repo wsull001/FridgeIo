@@ -1,8 +1,11 @@
 package com.example.wyattsullivan.fridgeio;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.text.SimpleDateFormat;
 
 /**
  * Created by wyattsullivan on 1/29/18.
@@ -35,7 +38,25 @@ public class DbHelper extends SQLiteOpenHelper {
                                                             "quantity INT, " +
                                                             "notes TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS Fridge (fridgeID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                                                       "fname TEXT, passwrd TEXT)");
+                "fname TEXT, passwrd TEXT)");
+    }
+
+    public boolean insertProduct(Product prod) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("name", prod.getName());
+        cv.put("FridgeID", prod.getFridgeID());
+        cv.put("description", prod.getDesc());
+        cv.put("fullness", prod.getCapacity());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        cv.put("expDate", df.format(prod.getExpDate()));
+        cv.put("dateAdded", df.format(prod.getDateAdded()));
+        long result = db.insert("ProductList",null, cv);
+        if (result == -1) {
+            return false;
+        }
+        return true;
+
     }
 
     @Override
