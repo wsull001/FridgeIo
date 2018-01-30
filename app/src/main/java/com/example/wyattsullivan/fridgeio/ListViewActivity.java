@@ -5,12 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.Date;
+public class ListViewActivity extends AppCompatActivity {
 
-public class MainActivity extends AppCompatActivity {
-
+    private ListView productListView;
     private TextView mTextMessage;
     private DbHelper mydb;
 
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_listview);
 
         mydb = new DbHelper(this);
 
