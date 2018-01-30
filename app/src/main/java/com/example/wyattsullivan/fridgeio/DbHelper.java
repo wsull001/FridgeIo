@@ -2,10 +2,12 @@ package com.example.wyattsullivan.fridgeio;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  * Created by wyattsullivan on 1/29/18.
@@ -59,6 +61,41 @@ public class DbHelper extends SQLiteOpenHelper {
 
     }
 
+    private ArrayList<Product> turnCursIntoProducts(Cursor cursor) {
+        ArrayList<Product> ret = new ArrayList<Product>();
+
+        while (cursor.moveToNext()) {
+            Product p = new Product();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            p.setId(cursor.getInt(0));
+            p.setName(cursor.getString(1));
+            p.setFridgeID(cursor.getInt(2));
+            p.setDescription(cursor.getString(3));
+            p.setCapacity(cursor.getInt(4));
+            try {
+                p.setExpirationDate(df.parse(cursor.getString(5)));
+                p.setDateAdded(df.parse(cursor.getString(6)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ret.add(p);
+
+        }
+
+
+        return ret;
+    }
+
+
+    public Product getProductById(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM ProductList WHERE prodID = " + Integer.toString(id), null);
+
+        if (curs.getCount() == 0)
+            return null;
+        return turnCursIntoProducts(curs).get(0);
+
+    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
