@@ -25,7 +25,7 @@ public class DbHelper extends SQLiteOpenHelper {
                                                             "FridgeID INTEGER, " +
                                                             "description TEXT," +
                                                             "fullness INTEGER," +
-                                                            "expDate DATE)");
+                                                            "expDate DATE, dateAdded DATE)");
         db.execSQL("CREATE TABLE IF NOT EXISTS ToUpdate (updateID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                          "type INTEGER, " +
                                                          "prodID INTEGER," +
@@ -34,6 +34,8 @@ public class DbHelper extends SQLiteOpenHelper {
                                                             "name TEXT, " +
                                                             "quantity INT, " +
                                                             "notes TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS Fridge (fridgeID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                                       "fname TEXT, passwrd TEXT)");
     }
 
     @Override

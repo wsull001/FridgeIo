@@ -9,8 +9,43 @@ import java.util.Date;
 public class Product {
     private String name;
     private Date expirationDate;
+    private Date dateAdded;
     private String description;
     private int capacity;
+    private int id;
+
+
+    public Product() {
+        name = null;
+        expirationDate = null;
+        description = null;
+        capacity = -1;
+        id = -1;
+    }
+
+    public void setExpirationDate(Date dt) {
+        expirationDate = dt;
+    }
+
+    public void setDateAdded(Date da) {
+        dateAdded = da;
+    }
+
+    public void setName(String nm) {
+        name = nm;
+    }
+
+    public void setDescription(String desc) {
+        description = desc;
+    }
+
+    public void setCapacity(int cap) {
+        capacity = cap;
+    }
+
+    public void setId(int ID) {
+        this.id = ID;
+    }
 
     public String getName() {
         return name;
@@ -24,7 +59,14 @@ public class Product {
         return expirationDate;
     }
 
+    public Date getDateAdded() {
+        return dateAdded;
+    }
+
     public int getCapacity() {
         return capacity;
+    }
+    public int getId() {
+        return id;
     }
 }
