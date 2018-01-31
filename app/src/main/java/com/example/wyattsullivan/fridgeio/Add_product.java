@@ -51,7 +51,6 @@ public class Add_product extends AppCompatActivity {
         expDay = cal.get(Calendar.DAY_OF_MONTH);
 
         //Prepares DatePicker
-        //TODO: REDO DATEPICKER
         selectExpDateButton = (Button) findViewById(R.id.setExpButton);
         selectExpDateButton.setOnClickListener(new OnClickListener() {
             @Override
