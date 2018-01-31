@@ -1,5 +1,6 @@
 package com.example.wyattsullivan.fridgeio;
 
+import android.app.DatePickerDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.AdapterView;
@@ -16,21 +17,23 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Date;
 
 public class Add_product extends AppCompatActivity {
     //Widget Variables
     //TODO: Add support for image
+
+    DatePickerDialog.OnDateSetListener expDatePicker;
     Button submitButton;
-    DatePicker date;
+    Button selectExpDateButton;
     EditText name;
     EditText Description;
-    //Calendar for the purpose of setting the datepicker to current date, user convenience
-    Calendar cal = Calendar.getInstance();
-    int currentYear = cal.get(Calendar.YEAR);
-    int currentMonth = cal.get(Calendar.MONTH);
-    int currentDay = cal.get(Calendar.DAY_OF_MONTH);
+
+    int expYear;
+    int expMonth;
+    int expDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +44,42 @@ public class Add_product extends AppCompatActivity {
         submitButton = (Button) findViewById(R.id.SubmitButton);
         submitButton.setOnClickListener(buttonClickListener);
 
+        //default exp will be today
+        Calendar cal = Calendar.getInstance();
+        expYear = cal.get(Calendar.YEAR);
+        expMonth = cal.get(Calendar.MONTH);
+        expDay = cal.get(Calendar.DAY_OF_MONTH);
+
         //Prepares DatePicker
-        date = (DatePicker) findViewById(R.id.datePicker);
-        date.updateDate(currentYear,currentMonth,currentDay);
+        //TODO: REDO DATEPICKER
+        selectExpDateButton = (Button) findViewById(R.id.setExpButton);
+        selectExpDateButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //get current date to set as default
+                int year = expYear;
+                int day = expDay;
+                int month = expMonth;
+
+                DatePickerDialog myDialog = new DatePickerDialog(Add_product.this, R.style.Theme_AppCompat_DayNight,
+                        expDatePicker,
+                        year, month, day);
+                myDialog.show();
+            }
+        });
+
+        expDatePicker = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                expYear = year;
+                expMonth = month;
+                expDay = dayOfMonth;
+
+                TextView text = (TextView) findViewById(R.id.ExpDateTextView);
+                text.setText("" + (month+1) + "-" + dayOfMonth + "-" + year);
+            }
+        };
+
 
         //Edittexts
         name = (EditText) findViewById(R.id.Name);
@@ -63,9 +99,9 @@ public class Add_product extends AppCompatActivity {
                     //Note this roundabout Calendar junk is because many Date constructors are
                     //deprecated and this is one way to still get a Date variable
                     Calendar tempDate = Calendar.getInstance();
-                    tempDate.set(Calendar.YEAR, date.getYear());
-                    tempDate.set(Calendar.MONTH, date.getMonth());
-                    tempDate.set(Calendar.DAY_OF_MONTH, date.getDayOfMonth());
+                    tempDate.set(Calendar.YEAR, expYear);
+                    tempDate.set(Calendar.MONTH, expMonth);
+                    tempDate.set(Calendar.DAY_OF_MONTH, expDay);
                     Date exDate = tempDate.getTime();
                     //Create sample product
                     Product product = new Product();
