@@ -1,11 +1,14 @@
 package com.example.wyattsullivan.fridgeio;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuView;
+import android.view.Menu;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -30,6 +33,10 @@ public class ListViewActivity extends AppCompatActivity {
                     mTextMessage.setText(R.string.title_dashboard);
                     return true;
                 case R.id.navigation_notifications:
+                    //Modification to temporarily access Add product activity
+                    //Used for debugging/early emulating testing
+                    //TODO: Remove this if necessary OR when AddProduct is able to be accessed normally
+                    startActivity(new Intent(ListViewActivity.this,Add_product.class));
                     mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
@@ -75,5 +82,25 @@ public class ListViewActivity extends AppCompatActivity {
         transaction.replace(R.id.frame_layout, Fragment_One.newInstance());
         transaction.commit();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.add_button) {
+            Intent intent = new Intent(this, Add_product.class);
+            startActivity(intent);
+            return true;
+        }
+        return false;
+    }
+
+
 
 }

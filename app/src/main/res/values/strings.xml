@@ -3,7 +3,7 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    
+
     <string-array name="titles">
         <item>Meme 1</item>
         <item>Meme 2</item>
@@ -33,5 +33,10 @@
         <item>Blah 11</item>
         <item>Blah 12</item>
     </string-array>
-    
+
+
+    <string name="name">Product Name</string>
+    <string name="Description">Description</string>
+    <string name="ExpDate">Expiration Date</string>
+    <string name="Submit">Submit</string>
 </resources>
