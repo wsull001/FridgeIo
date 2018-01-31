@@ -126,12 +126,21 @@ public class Add_product extends AppCompatActivity {
                     //Debugging Output
                     //Outputs simple information drawn from the product to ensure the product
                     //variable is properly created and that getters and setters are working
-                    //TODO: Remove this when all is complete
+
+                    DbHelper myDB = new DbHelper(Add_product.this);
+                    myDB.insertProduct(product);
+
+
+                    //TODO: Remove comments when this is complete
+                    /*
                     String output = "Product: " + product.getName() + "\n"
                             + "Expire: " + product.getExpDate() + "\n"
                             + "Added: " + product.getDateAdded() + "\n"
                             + "Desc: " + product.getDesc();
                     Toast.makeText(getBaseContext(), output, Toast.LENGTH_LONG).show();
+                    */
+
+
                     Intent goHome = new Intent(Add_product.this, ListViewActivity.class);
                     startActivity(goHome);
             }
