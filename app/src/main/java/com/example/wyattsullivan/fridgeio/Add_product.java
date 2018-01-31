@@ -1,6 +1,7 @@
 package com.example.wyattsullivan.fridgeio;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ public class Add_product extends AppCompatActivity {
     DatePickerDialog.OnDateSetListener expDatePicker;
     Button submitButton;
     Button selectExpDateButton;
+    Button cancelButton;
     EditText name;
     EditText Description;
 
@@ -43,6 +45,18 @@ public class Add_product extends AppCompatActivity {
         //Button Setter, Prepares for the submit button
         submitButton = (Button) findViewById(R.id.SubmitButton);
         submitButton.setOnClickListener(buttonClickListener);
+
+
+        //Button Setter, Prepares for the cancel button
+        cancelButton = (Button) findViewById(R.id.CancelButton);
+        cancelButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goHome = new Intent(Add_product.this, ListViewActivity.class);
+                startActivity(goHome);
+            }
+        });
+
 
         //default exp will be today
         Calendar cal = Calendar.getInstance();
@@ -118,6 +132,8 @@ public class Add_product extends AppCompatActivity {
                             + "Added: " + product.getDateAdded() + "\n"
                             + "Desc: " + product.getDesc();
                     Toast.makeText(getBaseContext(), output, Toast.LENGTH_LONG).show();
+                    Intent goHome = new Intent(Add_product.this, ListViewActivity.class);
+                    startActivity(goHome);
             }
         }
     };
