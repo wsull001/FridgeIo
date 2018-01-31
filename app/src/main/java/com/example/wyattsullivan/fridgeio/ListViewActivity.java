@@ -30,6 +30,10 @@ public class ListViewActivity extends AppCompatActivity {
                     mTextMessage.setText(R.string.title_dashboard);
                     return true;
                 case R.id.navigation_notifications:
+                    //Modification to temporarily access Add product activity
+                    //Used for debugging/early emulating testing
+                    //TODO: Remove this if necessary OR when AddProduct is able to be accessed normally
+                    startActivity(new Intent(ListViewActivity.this,Add_product.class));
                     mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
