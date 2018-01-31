@@ -1,5 +1,6 @@
 package com.example.wyattsullivan.fridgeio;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -52,6 +53,18 @@ public class ListViewActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_bar_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.add_button) {
+            Intent intent = new Intent(this, Add_product.class);
+            startActivity(intent);
+            return true;
+        }
+        return false;
     }
 
 
