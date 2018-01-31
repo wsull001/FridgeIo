@@ -34,8 +34,7 @@ public class DbHelper extends SQLiteOpenHelper {
         //1-new, 2-delete, 3-updated
         db.execSQL("CREATE TABLE IF NOT EXISTS ToUpdate (updateID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                          "type INTEGER, " +
-                                                         "prodID INTEGER," +
-                                                         "FOREIGN KEY (prodID) REFERENCES ProductList(prodID))");
+                                                         "prodID INTEGER)");
         db.execSQL("CREATE TABLE IF NOT EXISTS GroceryList (grocID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                             "name TEXT, " +
                                                             "quantity INT, " +
