@@ -57,8 +57,22 @@ public class DbHelper extends SQLiteOpenHelper {
         if (result == -1) {
             return false;
         }
+
+        //TODO: ADD TO UPDATED TABLE
         return true;
 
+    }
+
+
+    public boolean deleteProduct(int id) {
+        //TODO: implement delete
+        return false;
+    }
+
+
+    public boolean updateProductFullness(int id, int cap) {
+        //TODO: implement update fullness
+        return false;
     }
 
     private ArrayList<Product> turnCursIntoProducts(Cursor cursor) {
@@ -96,6 +110,24 @@ public class DbHelper extends SQLiteOpenHelper {
         return turnCursIntoProducts(curs).get(0);
 
     }
+
+    public ArrayList<Product> getProductsByDateAdded() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM ProductList ORDER BY dateAdded", null);
+        if (curs.getCount() == 0)
+            return null;
+        return turnCursIntoProducts(curs);
+    }
+
+    public ArrayList<Product> getProductsByExpDate() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM ProductList ORDER BY expDate", null);
+        if (curs.getCount() == 0)
+            return null;
+        return turnCursIntoProducts(curs);
+    }
+
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 

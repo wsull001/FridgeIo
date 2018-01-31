@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -52,5 +53,7 @@ public class ListViewActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.action_bar_menu, menu);
         return true;
     }
+
+
 
 }
