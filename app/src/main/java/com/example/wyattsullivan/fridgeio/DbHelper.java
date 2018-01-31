@@ -31,6 +31,7 @@ public class DbHelper extends SQLiteOpenHelper {
                                                             "description TEXT," +
                                                             "fullness INTEGER," +
                                                             "expDate DATE, dateAdded DATE)");
+        //1-new, 2-delete, 3-updated
         db.execSQL("CREATE TABLE IF NOT EXISTS ToUpdate (updateID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                          "type INTEGER, " +
                                                          "prodID INTEGER," +
@@ -58,7 +59,24 @@ public class DbHelper extends SQLiteOpenHelper {
             return false;
         }
 
-        //TODO: ADD TO UPDATED TABLE
+        Cursor curPos = db.rawQuery("SELECT MAX(prodID) FROM ProductList", null);
+        if (curPos.getCount() == 0)
+            return false;
+
+
+        curPos.moveToNext();
+
+        int id = curPos.getInt(0);
+
+        cv = new ContentValues();
+
+        cv.put("type", 1); //mark as new entry
+        cv.put("prodID", id);
+
+        result = db.insert("ToUpdate", null, cv);
+
+        if (result == -1)
+            return false;
         return true;
 
     }
