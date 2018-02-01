@@ -29,10 +29,10 @@ public class ListViewActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     mTextMessage.setText(R.string.title_home);
                     return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                case R.id.navigation_bluetoothconnect:
+                    mTextMessage.setText(R.string.title_bluetoothconnect);
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navigation_grocerylist:
                     //Modification to temporarily access Add product activity
                     //Used for debugging/early emulating testing
                     //TODO: Remove this if necessary OR when AddProduct is able to be accessed normally
@@ -64,10 +64,10 @@ public class ListViewActivity extends AppCompatActivity {
                             case R.id.navigation_home:
                                 selectedFragment = Fragment_One.newInstance();
                                 break;
-                            case R.id.navigation_dashboard:
+                            case R.id.navigation_bluetoothconnect:
                                 selectedFragment = Fragment_Two.newInstance();
                                 break;
-                            case R.id.navigation_notifications:
+                            case R.id.navigation_grocerylist:
                                 selectedFragment = Fragment_Three.newInstance();
                                 break;
                         }
