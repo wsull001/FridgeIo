@@ -14,7 +14,7 @@ public class Product {
     private Date dateAdded;
     private String description;
     private int capacity;
-    private int id;
+    private String id;
     private int fridgeID;
 
 
@@ -23,7 +23,7 @@ public class Product {
         expirationDate = null;
         description = null;
         capacity = -1;
-        id = -1;
+        id = null;
     }
 
     public void setFridgeID(int fid) {
@@ -50,7 +50,7 @@ public class Product {
         capacity = cap;
     }
 
-    public void setId(int ID) {
+    public void setId(String ID) {
         this.id = ID;
     }
 
@@ -73,7 +73,7 @@ public class Product {
     public int getCapacity() {
         return capacity;
     }
-    public int getId() {
+    public String getId() {
         return id;
     }
 

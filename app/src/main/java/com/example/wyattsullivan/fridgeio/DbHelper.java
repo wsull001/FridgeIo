@@ -25,7 +25,7 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //create the ProductList
-        db.execSQL("CREATE TABLE ProductList (prodID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        db.execSQL("CREATE TABLE ProductList (prodID CHAR(30) PRIMARY KEY, " +
                                                             "name TEXT, " +
                                                             "FridgeID INTEGER, " +
                                                             "description TEXT," +
@@ -34,7 +34,7 @@ public class DbHelper extends SQLiteOpenHelper {
         //1-new, 2-delete, 3-updated
         db.execSQL("CREATE TABLE IF NOT EXISTS ToUpdate (updateID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                          "type INTEGER, " +
-                                                         "prodID INTEGER)");
+                                                         "prodID CHAR(30))");
         db.execSQL("CREATE TABLE IF NOT EXISTS GroceryList (grocID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                             "name TEXT, " +
                                                             "quantity INT, " +
@@ -43,9 +43,22 @@ public class DbHelper extends SQLiteOpenHelper {
                 "fname TEXT, passwrd TEXT)");
     }
 
+
+    private String genRand30Char() { //new primary key for fridge and productList
+        StringBuffer ret = new StringBuffer(30);
+        for (int i = 0; i < 30; i++) {
+            int randNum = (int)(Math.random() * 52);
+            char nextChar = (char)(randNum > 25 ? ('A' + randNum - 26) : ('a' + randNum));
+            ret.append(nextChar);
+        }
+        return ret.toString();
+    }
+
     public boolean insertProduct(Product prod) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
+        String key = genRand30Char();
+        cv.put("prodID", key);
         cv.put("name", prod.getName());
         cv.put("FridgeID", prod.getFridgeID());
         cv.put("description", prod.getDesc());
@@ -58,19 +71,9 @@ public class DbHelper extends SQLiteOpenHelper {
             return false;
         }
 
-        Cursor curPos = db.rawQuery("SELECT MAX(prodID) FROM ProductList", null);
-        if (curPos.getCount() == 0)
-            return false;
-
-
-        curPos.moveToNext();
-
-        int id = curPos.getInt(0);
-
         cv = new ContentValues();
-
         cv.put("type", 1); //mark as new entry
-        cv.put("prodID", id);
+        cv.put("prodID", key);
 
         result = db.insert("ToUpdate", null, cv);
 
@@ -98,7 +101,7 @@ public class DbHelper extends SQLiteOpenHelper {
         while (cursor.moveToNext()) {
             Product p = new Product();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            p.setId(cursor.getInt(0));
+            p.setId(cursor.getString(0));
             p.setName(cursor.getString(1));
             p.setFridgeID(cursor.getInt(2));
             p.setDescription(cursor.getString(3));
