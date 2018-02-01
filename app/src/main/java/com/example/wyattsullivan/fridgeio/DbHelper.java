@@ -121,9 +121,15 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    public Product getProductById(int id) {
+    public boolean updateCapacity(int capacity, String prodID) {
+        //TODO: implement capacity updating
+        return false;
+    }
+
+
+    public Product getProductById(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT * FROM ProductList WHERE prodID = " + Integer.toString(id), null);
+        Cursor curs = db.rawQuery("SELECT * FROM ProductList WHERE prodID = '" + id + "'", null);
 
         if (curs.getCount() == 0)
             return null;

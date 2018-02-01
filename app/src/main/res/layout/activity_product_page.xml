@@ -17,7 +17,7 @@
         app:srcCompat="@drawable/test" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/productPageName"
         android:layout_width="wrap_content"
         android:layout_height="63dp"
         android:layout_marginStart="8dp"
@@ -93,10 +93,10 @@
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/productPageName" />
 
     <SeekBar
-        android:id="@+id/seekBar2"
+        android:id="@+id/capacitySeekBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
