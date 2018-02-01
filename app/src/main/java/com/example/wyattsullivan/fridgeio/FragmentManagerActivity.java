@@ -7,14 +7,12 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.MenuView;
 import android.view.Menu;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ListViewActivity extends AppCompatActivity {
+public class FragmentManagerActivity extends AppCompatActivity {
 
     private ListView productListView;
     private TextView mTextMessage;
@@ -27,7 +25,7 @@ public class ListViewActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
+                    mTextMessage.setText(R.string.title_products);
                     return true;
                 case R.id.navigation_bluetoothconnect:
                     mTextMessage.setText(R.string.title_bluetoothconnect);
@@ -36,8 +34,8 @@ public class ListViewActivity extends AppCompatActivity {
                     //Modification to temporarily access Add product activity
                     //Used for debugging/early emulating testing
                     //TODO: Remove this if necessary OR when AddProduct is able to be accessed normally
-                    startActivity(new Intent(ListViewActivity.this,Add_product.class));
-                    mTextMessage.setText(R.string.title_notifications);
+                    startActivity(new Intent(FragmentManagerActivity.this,Add_product.class));
+                    mTextMessage.setText(R.string.title_grocerylist);
                     return true;
             }
             return false;
@@ -47,7 +45,7 @@ public class ListViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_listview);
+        setContentView(R.layout.activity_fragment_manager);
 
         mydb = new DbHelper(this);
 
@@ -62,13 +60,13 @@ public class ListViewActivity extends AppCompatActivity {
                         Fragment selectedFragment = null;
                         switch (item.getItemId()) {
                             case R.id.navigation_home:
-                                selectedFragment = Fragment_One.newInstance();
+                                selectedFragment = Fragment_ProductView.newInstance();
                                 break;
                             case R.id.navigation_bluetoothconnect:
-                                selectedFragment = Fragment_Two.newInstance();
+                                selectedFragment = Fragment_Bluetooth.newInstance();
                                 break;
                             case R.id.navigation_grocerylist:
-                                selectedFragment = Fragment_Three.newInstance();
+                                selectedFragment = Fragment_GroceryList.newInstance();
                                 break;
                         }
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -79,7 +77,7 @@ public class ListViewActivity extends AppCompatActivity {
                 });
         //Manually displaying the first fragment - one time only
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_layout, Fragment_One.newInstance());
+        transaction.replace(R.id.frame_layout, Fragment_ProductView.newInstance());
         transaction.commit();
     }
 

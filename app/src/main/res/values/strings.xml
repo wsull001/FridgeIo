@@ -3,41 +3,41 @@
     <string name="title_home">Home</string>
     <string name="title_bluetoothconnect">Bluetooth Connect</string>
     <string name="title_notifications">Notifications</string>
-
-    <string-array name="titles">
-        <item>Meme 1</item>
-        <item>Meme 2</item>
-        <item>Meme 3</item>
-        <item>Meme 4</item>
-        <item>Meme 5</item>
-        <item>Meme 6</item>
-        <item>Meme 7</item>
-        <item>Meme 8</item>
-        <item>Meme 9</item>
-        <item>Meme 10</item>
-        <item>Meme 11</item>
-        <item>Meme 12</item>
-    </string-array>
-
-    <string-array name="descriptions">
-        <item>Blah 1</item>
-        <item>Blah 2</item>
-        <item>Blah 3</item>
-        <item>Blah 4</item>
-        <item>Blah 5</item>
-        <item>Blah 6</item>
-        <item>Blah 7</item>
-        <item>Blah 8</item>
-        <item>Blah 9</item>
-        <item>Blah 10</item>
-        <item>Blah 11</item>
-        <item>Blah 12</item>
-    </string-array>
-
-
     <string name="name">Product Name</string>
     <string name="Description">Description</string>
     <string name="ExpDate">Expiration Date</string>
     <string name="Submit">Submit</string>
-    <string name="grocery_list">Grocery List</string>
+    <string name="title_grocerylist">Grocery List</string>
+    <string name="title_products">Products</string>
+
+    <string-array name="titles">
+        <item>Product 1</item>
+        <item>Product 2</item>
+        <item>Product 3</item>
+        <item>Product 4</item>
+        <item>Product 5</item>
+        <item>Product 6</item>
+        <item>Product 7</item>
+        <item>Product 8</item>
+        <item>Product 9</item>
+        <item>Product 10</item>
+        <item>Product 11</item>
+        <item>Product 12</item>
+    </string-array>
+
+    <string-array name="descriptions">
+        <item>Description 1</item>
+        <item>Description 2</item>
+        <item>Description 3</item>
+        <item>Description 4</item>
+        <item>Description 5</item>
+        <item>Description 6</item>
+        <item>Description 7</item>
+        <item>Description 8</item>
+        <item>Description 9</item>
+        <item>Description 10</item>
+        <item>Description 11</item>
+        <item>Description 12</item>
+    </string-array>
+
 </resources>

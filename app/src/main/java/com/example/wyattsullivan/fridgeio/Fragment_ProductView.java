@@ -18,28 +18,26 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.zip.Inflater;
+public class Fragment_ProductView extends Fragment {
 
-public class Fragment_One extends Fragment {
-
-    private String[] memeTitles;
-    private String[] memeDescriptions;
+    private String[] productNames;
+    private String[] productDescriptions;
     private int[] arr = {R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test};
 
 
-    public static Fragment_One newInstance() {
-        Fragment_One fragment = new Fragment_One();
+    public static Fragment_ProductView newInstance() {
+        Fragment_ProductView fragment = new Fragment_ProductView();
         return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_one, container, false);
+        View view = inflater.inflate(R.layout.fragment_productview, container, false);
 
         Resources res = getResources();
-        memeTitles = res.getStringArray(R.array.titles);
-        memeDescriptions = res.getStringArray(R.array.descriptions);
+        productNames = res.getStringArray(R.array.titles);
+        productDescriptions = res.getStringArray(R.array.descriptions);
 
         //String[] productItems = {"Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple"};
 
@@ -48,9 +46,10 @@ public class Fragment_One extends Fragment {
 //        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(
 //          getActivity(), android.R.layout.simple_list_item_1, productItems);
 
-        productAdapter adapter = new productAdapter(getActivity(), memeTitles, arr, memeDescriptions);
+        productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
         list.setAdapter(adapter);
 
+        // TODO: WORK ON CREATING AN ONCLICKLISTENER FOR EACH LISTVIEW
         //list.setOnItemClickListener(new );
 
         //list.setAdapter(listViewAdapter);
@@ -67,7 +66,7 @@ class productAdapter extends ArrayAdapter<String>
     String[] descriptionArray;
     productAdapter(Context c, String[] titles, int imgs[], String[] desc)
     {
-        super(c, R.layout.single_row, R.id.textViewTitle, titles);
+        super(c, R.layout.single_productview, R.id.textViewTitle, titles);
         this.context = c;
         this.images = imgs;
         this.titleArray = titles;
@@ -81,9 +80,9 @@ class productAdapter extends ArrayAdapter<String>
         // layout inflater object to converts xml appearance description into java object
         LayoutInflater inflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // look up how inflation/inflater works (watch video)
-        View row = inflater.inflate(R.layout.single_row, parent, false);
+        View row = inflater.inflate(R.layout.single_productview, parent, false);
 
-        ImageView myImage = row.findViewById(R.id.imageView2);
+        ImageView myImage = row.findViewById(R.id.productView);
         TextView myTitle = row.findViewById(R.id.textViewTitle);
         TextView myDescription = row.findViewById(R.id.textViewDescription);
 

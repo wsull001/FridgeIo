@@ -14,6 +14,6 @@
     <item
         android:id="@+id/navigation_grocerylist"
         android:icon="@drawable/ic_local_grocery_store_black_24dp"
-        android:title="@string/grocery_list" />
+        android:title="@string/title_grocerylist" />
 
 </menu>

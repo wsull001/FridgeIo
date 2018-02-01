@@ -10,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class Fragment_Three extends Fragment {
-    public static Fragment_Three newInstance() {
-        Fragment_Three fragment = new Fragment_Three();
+public class Fragment_Bluetooth extends Fragment {
+    public static Fragment_Bluetooth newInstance() {
+        Fragment_Bluetooth fragment = new Fragment_Bluetooth();
         return fragment;
     }
 
@@ -24,6 +24,6 @@ public class Fragment_Three extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_three, container, false);
+        return inflater.inflate(R.layout.fragment_bluetooth, container, false);
     }
 }

@@ -10,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class Fragment_Two extends Fragment {
-    public static Fragment_Two newInstance() {
-        Fragment_Two fragment = new Fragment_Two();
+public class Fragment_GroceryList extends Fragment {
+    public static Fragment_GroceryList newInstance() {
+        Fragment_GroceryList fragment = new Fragment_GroceryList();
         return fragment;
     }
 
@@ -24,6 +24,6 @@ public class Fragment_Two extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_two, container, false);
+        return inflater.inflate(R.layout.fragment_grocerylist, container, false);
     }
 }
