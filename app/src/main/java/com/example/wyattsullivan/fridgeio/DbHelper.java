@@ -84,13 +84,13 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean deleteProduct(int id) {
+    public boolean deleteProduct(String id) {
         //TODO: implement delete
         return false;
     }
 
 
-    public boolean updateProductFullness(int id, int cap) {
+    public boolean updateProductFullness(String id, int cap) {
         //TODO: implement update fullness
         return false;
     }

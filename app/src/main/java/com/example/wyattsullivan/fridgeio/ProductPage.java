@@ -5,6 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import java.util.Date;
+import java.util.Calendar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class ProductPage extends AppCompatActivity {
     private DbHelper dbHelper;
@@ -23,7 +26,7 @@ public class ProductPage extends AppCompatActivity {
             //TODO: Error it up!!!
         }
 
-        String prodID = intent.getStringExtra("prodID");
+        final String prodID = intent.getStringExtra("prodID");
 
         //get the product to display
         dbHelper = new DbHelper(this);
@@ -36,7 +39,33 @@ public class ProductPage extends AppCompatActivity {
         expDate = (TextView) findViewById(R.id.productPageExpDate);
         addDate = (TextView) findViewById(R.id.productPageAddDate);
 
+        //Set the fields to be the product information that we need to appear
+        name.setText(theProduct.getName());
+        Calendar exp = Calendar.getInstance();
+        exp.setTime(theProduct.getExpDate());
+        String expirationDate = "Exp Date:\n" + (exp.get(Calendar.MONTH)+1) + "/"
+                + (exp.get(Calendar.DAY_OF_MONTH)) + "/" + (exp.get(Calendar.YEAR));
+        expDate.setText(expirationDate);
+        Calendar add = Calendar.getInstance();
+        add.setTime(theProduct.getDateAdded());
+        String addedDate = "Add Date:\n" + (add.get(Calendar.MONTH)+1) + "/"
+                + (add.get(Calendar.DAY_OF_MONTH)) + "/" + (add.get(Calendar.YEAR));
+        addDate.setText(addedDate);
+        descriptionBox.setText(theProduct.getDesc());
 
+        seekBar.setProgress(theProduct.getCapacity());
 
+        seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+            public void onStopTrackingTouch(SeekBar seekBar){
+                // TODO My code goes here
+
+                int level = seekBar.getProgress();
+                dbHelper.updateProductFullness(prodID, level);
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar){}
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){}
+        });
     }
 }

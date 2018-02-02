@@ -116,6 +116,7 @@ public class Add_product extends AppCompatActivity {
                     product.setExpirationDate(exDate);
                     product.setDateAdded(Calendar.getInstance().getTime());
                     product.setDescription(desc);
+                    product.setCapacity(100);
 
                     //Debugging Output
                     //Outputs simple information drawn from the product to ensure the product
