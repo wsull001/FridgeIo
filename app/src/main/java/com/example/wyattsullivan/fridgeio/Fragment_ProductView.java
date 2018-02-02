@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -26,6 +27,7 @@ public class Fragment_ProductView extends Fragment {
     private String[] productNames;
     private String[] productDescriptions;
     private int[] arr;
+    ArrayList<Product> prods;
     DbHelper dbHelp;
 
 
@@ -41,7 +43,7 @@ public class Fragment_ProductView extends Fragment {
 
         dbHelp = new DbHelper(getActivity());
 
-        ArrayList<Product> prods = dbHelp.getProductsByDateAdded();
+        prods = dbHelp.getProductsByDateAdded();
         productNames = new String[prods.size()];
         productDescriptions = new String[prods.size()];
         arr = new int[prods.size()];
@@ -60,8 +62,18 @@ public class Fragment_ProductView extends Fragment {
 //        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(
 //          getActivity(), android.R.layout.simple_list_item_1, productItems);
 
-        productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions, prods);
+        productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
         list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), ProductPage.class);
+                intent.putExtra("prodID", Fragment_ProductView.this.prods.get(position).getId());
+                startActivity(intent);
+            }
+        });
 
         // TODO: WORK ON CREATING AN ONCLICKLISTENER FOR EACH LISTVIEW
 
@@ -75,15 +87,13 @@ class productAdapter extends ArrayAdapter<String>
     int[] images;
     String[] titleArray;
     String[] descriptionArray;
-    ArrayList<Product> prods;
-    productAdapter(Context c, String[] titles, int imgs[], String[] desc, ArrayList<Product> p)
+    productAdapter(Context c, String[] titles, int imgs[], String[] desc)
     {
         super(c, R.layout.single_productview, R.id.textViewTitle, titles);
         this.context = c;
         this.images = imgs;
         this.titleArray = titles;
         this.descriptionArray = desc;
-        this.prods = p;
 
     }
 
