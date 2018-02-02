@@ -5,6 +5,7 @@ package com.example.wyattsullivan.fridgeio;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,11 +19,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class Fragment_ProductView extends Fragment {
 
     private String[] productNames;
     private String[] productDescriptions;
-    private int[] arr = {R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test, R.drawable.test};
+    private int[] arr;
+    DbHelper dbHelp;
 
 
     public static Fragment_ProductView newInstance() {
@@ -35,9 +39,19 @@ public class Fragment_ProductView extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_productview, container, false);
 
-        Resources res = getResources();
-        productNames = res.getStringArray(R.array.titles);
-        productDescriptions = res.getStringArray(R.array.descriptions);
+        dbHelp = new DbHelper(getActivity());
+
+        ArrayList<Product> prods = dbHelp.getProductsByDateAdded();
+        productNames = new String[prods.size()];
+        productDescriptions = new String[prods.size()];
+        arr = new int[prods.size()];
+
+        for (int i = 0; i < prods.size(); i++) {
+            productNames[i] = prods.get(i).getName();
+            productDescriptions[i] = prods.get(i).getDesc();
+            arr[i] = R.drawable.test;
+
+        }
 
         //String[] productItems = {"Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple"};
 
@@ -46,13 +60,10 @@ public class Fragment_ProductView extends Fragment {
 //        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(
 //          getActivity(), android.R.layout.simple_list_item_1, productItems);
 
-        productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
+        productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions, prods);
         list.setAdapter(adapter);
 
         // TODO: WORK ON CREATING AN ONCLICKLISTENER FOR EACH LISTVIEW
-        //list.setOnItemClickListener(new );
-
-        //list.setAdapter(listViewAdapter);
 
         return view;
     }
@@ -64,13 +75,15 @@ class productAdapter extends ArrayAdapter<String>
     int[] images;
     String[] titleArray;
     String[] descriptionArray;
-    productAdapter(Context c, String[] titles, int imgs[], String[] desc)
+    ArrayList<Product> prods;
+    productAdapter(Context c, String[] titles, int imgs[], String[] desc, ArrayList<Product> p)
     {
         super(c, R.layout.single_productview, R.id.textViewTitle, titles);
         this.context = c;
         this.images = imgs;
         this.titleArray = titles;
         this.descriptionArray = desc;
+        this.prods = p;
 
     }
 
@@ -92,6 +105,12 @@ class productAdapter extends ArrayAdapter<String>
 
         return row;
     }
+
 }
+
+/*
+Intent intent = new Intent(context, ProductPage.class);
+intent.putExtra("prodID", product.getID_at_position)
+*/
 
 
