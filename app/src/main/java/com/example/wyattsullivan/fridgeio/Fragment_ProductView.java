@@ -44,6 +44,7 @@ public class Fragment_ProductView extends Fragment {
         dbHelp = new DbHelper(getActivity());
 
         prods = dbHelp.getProductsByDateAdded();
+        if (prods == null) return view;
         productNames = new String[prods.size()];
         productDescriptions = new String[prods.size()];
         arr = new int[prods.size()];
@@ -56,7 +57,6 @@ public class Fragment_ProductView extends Fragment {
         }
 
         //String[] productItems = {"Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple"};
-
         ListView list = (ListView) view.findViewById(R.id.listView);
 
 //        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(
