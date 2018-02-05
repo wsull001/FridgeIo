@@ -30,7 +30,8 @@ public class DbHelper extends SQLiteOpenHelper {
                                                             "FridgeID INTEGER, " +
                                                             "description TEXT," +
                                                             "fullness INTEGER," +
-                                                            "expDate DATE, dateAdded DATE)");
+                                                            "expDate DATE, dateAdded DATE," +
+                                                            "imageName TEXT)");
         //1-new, 2-delete, 3-updated
         db.execSQL("CREATE TABLE IF NOT EXISTS ToUpdate (updateID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                          "type INTEGER, " +
@@ -62,6 +63,7 @@ public class DbHelper extends SQLiteOpenHelper {
         cv.put("name", prod.getName());
         cv.put("FridgeID", prod.getFridgeID());
         cv.put("description", prod.getDesc());
+        cv.put("imageName", prod.getImageName());
         cv.put("fullness", prod.getCapacity());
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         cv.put("expDate", df.format(prod.getExpDate()));

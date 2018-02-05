@@ -16,6 +16,7 @@ public class Product {
     private int capacity;
     private String id;
     private int fridgeID;
+    private String imageName;
 
 
     public Product() {
@@ -24,6 +25,7 @@ public class Product {
         description = null;
         capacity = -1;
         id = null;
+        imageName = null;
     }
 
     public void setFridgeID(int fid) {
@@ -54,6 +56,10 @@ public class Product {
         this.id = ID;
     }
 
+    public void setImageName(String iName) {
+        imageName = iName;
+    }
+
     public String getName() {
         return name;
     }
@@ -79,5 +85,9 @@ public class Product {
 
     public int getFridgeID() {
         return fridgeID;
+    }
+
+    public String getImageName() {
+        return imageName;
     }
 }

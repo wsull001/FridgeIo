@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.wyattsullivan.fridgeio.ProductPage">
-
     <ImageView
         android:id="@+id/productPageImageView"
         android:layout_width="200dp"
@@ -15,6 +14,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/test" />
+
+
+
 
     <TextView
         android:id="@+id/productPageName"

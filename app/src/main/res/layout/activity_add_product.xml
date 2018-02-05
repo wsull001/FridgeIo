@@ -92,7 +92,18 @@
         app:layout_constraintStart_toEndOf="@+id/ExpDateTextView"
         app:layout_constraintTop_toBottomOf="@+id/ExpTextLine" />
 
+    <Button
+        android:id="@+id/image"
+        android:layout_width="166dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="8dp"
+        android:text="Add Photo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/setExpButton" />
+
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="52dp"
         android:layout_marginBottom="8dp"
@@ -120,5 +131,19 @@
             android:background="#0A0"
             android:text="@string/Submit" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/addProductImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image"
+        app:srcCompat="@drawable/noimageselected" />
 
 </android.support.constraint.ConstraintLayout>

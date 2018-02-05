@@ -25,6 +25,7 @@ public class FragmentManagerActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
+
                     mTextMessage.setText(R.string.title_products);
                     return true;
                 case R.id.navigation_bluetoothconnect:
