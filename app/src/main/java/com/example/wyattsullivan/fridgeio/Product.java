@@ -1,5 +1,7 @@
 package com.example.wyattsullivan.fridgeio;
 
+import android.graphics.Bitmap;
+
 import java.util.Date;
 
 /**
@@ -8,15 +10,14 @@ import java.util.Date;
 
 public class Product {
 
-    //TODO: add photo elements
     private String name;
     private Date expirationDate;
     private Date dateAdded;
     private String description;
     private int capacity;
     private String id;
-    private int fridgeID;
-    private String imageName;
+    private String fridgeID;
+    private Bitmap bmap;
 
 
     public Product() {
@@ -25,10 +26,10 @@ public class Product {
         description = null;
         capacity = -1;
         id = null;
-        imageName = null;
+        bmap = null;
     }
 
-    public void setFridgeID(int fid) {
+    public void setFridgeID(String fid) {
         fridgeID = fid;
     }
 
@@ -56,8 +57,8 @@ public class Product {
         this.id = ID;
     }
 
-    public void setImageName(String iName) {
-        imageName = iName;
+    public void setImage(Bitmap b) {
+        bmap = b;
     }
 
     public String getName() {
@@ -83,11 +84,11 @@ public class Product {
         return id;
     }
 
-    public int getFridgeID() {
+    public String getFridgeID() {
         return fridgeID;
     }
 
-    public String getImageName() {
-        return imageName;
+    public Bitmap getImage() {
+        return bmap;
     }
 }

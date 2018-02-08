@@ -3,6 +3,7 @@ package com.example.wyattsullivan.fridgeio;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import java.util.Date;
@@ -54,6 +55,12 @@ public class ProductPage extends AppCompatActivity {
         descriptionBox.setText(theProduct.getDesc());
 
         seekBar.setProgress(theProduct.getCapacity());
+
+
+        if (theProduct.getImage() != null)
+            ((ImageView)findViewById(R.id.productPageImageView)).setImageBitmap(theProduct.getImage());
+        else
+            ((ImageView)findViewById(R.id.productPageImageView)).setImageResource(R.drawable.test);
 
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
             public void onStopTrackingTouch(SeekBar seekBar){

@@ -53,6 +53,7 @@ public class Add_product extends AppCompatActivity {
     private int GALLERY = 1, CAMERA = 2;
     private ImageView imageview;
     private String imageName;
+    private Bitmap bitmap;
     int expYear;
     int expMonth;
     int expDay;
@@ -61,6 +62,10 @@ public class Add_product extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
+
+
+        //set the bitmap to null by default
+        bitmap = null;
         imageName = "";
         imageview = (ImageView) findViewById(R.id.addProductImageView);
         //Button Setter, Prepares for the submit button
@@ -130,7 +135,6 @@ public class Add_product extends AppCompatActivity {
     //Listener for buttons,
     //For the sake of simplicity a single listener will handle the button requests
     //This will handle both the image button and the submit button
-    //TODO: Note: that the image button is not yet implemented
     private View.OnClickListener buttonClickListener = new View.OnClickListener() {
         public void onClick(View view) {
             switch(view.getId()) {
@@ -151,24 +155,16 @@ public class Add_product extends AppCompatActivity {
                     product.setDateAdded(Calendar.getInstance().getTime());
                     product.setDescription(desc);
                     product.setCapacity(100);
-                    product.setImageName(imageName);
+                    product.setImage(bitmap);
 
                     //Debugging Output
                     //Outputs simple information drawn from the product to ensure the product
                     //variable is properly created and that getters and setters are working
 
                     DbHelper myDB = new DbHelper(Add_product.this);
-                    myDB.insertProduct(product);
+                    Log.d("Database", "trying to insert product");
+                    myDB.insertProduct(product, bitmap);
 
-
-                    //TODO: Remove comments when this is complete
-                    /*
-                    String output = "Product: " + product.getName() + "\n"
-                            + "Expire: " + product.getExpDate() + "\n"
-                            + "Added: " + product.getDateAdded() + "\n"
-                            + "Desc: " + product.getDesc();
-                    Toast.makeText(getBaseContext(), output, Toast.LENGTH_LONG).show();
-                    */
 
 
                     Intent goHome = new Intent(Add_product.this, FragmentManagerActivity.class);
@@ -257,7 +253,7 @@ public class Add_product extends AppCompatActivity {
                 Uri contentURI = data.getData();
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
-                    String path = saveImage(bitmap);
+                    this.bitmap = bitmap;
                     Toast.makeText(Add_product.this, "Image Saved!", Toast.LENGTH_SHORT).show();
                     imageview.setImageBitmap(bitmap);
 
@@ -270,12 +266,13 @@ public class Add_product extends AppCompatActivity {
         } else if (requestCode == CAMERA) {
             Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
             imageview.setImageBitmap(thumbnail);
-            //imageName = saveImage(thumbnail);
-            Toast.makeText(Add_product.this, "Image Saved!", Toast.LENGTH_SHORT).show();
+            bitmap = thumbnail;
         }
     }
 
-    public String saveImage(Bitmap myBitmap) {
+    //Commented out for now, trying db style
+    //TODO: remove completely if decide to
+    /*public String saveImage(Bitmap myBitmap) {
         File directory = new File(
                 Environment.getExternalStorageDirectory() + IMAGE_DIRECTORY);
 
@@ -301,6 +298,6 @@ public class Add_product extends AppCompatActivity {
             e1.printStackTrace();
         }
         return "";
-    }
+    }*/
 
 }

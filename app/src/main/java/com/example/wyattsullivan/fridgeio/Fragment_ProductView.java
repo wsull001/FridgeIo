@@ -7,6 +7,7 @@ package com.example.wyattsullivan.fridgeio;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,7 +27,7 @@ public class Fragment_ProductView extends Fragment {
 
     private String[] productNames;
     private String[] productDescriptions;
-    private int[] arr;
+    private Bitmap[] arr;
     ArrayList<Product> prods;
     DbHelper dbHelp;
 
@@ -47,20 +48,18 @@ public class Fragment_ProductView extends Fragment {
         if (prods == null) return view;
         productNames = new String[prods.size()];
         productDescriptions = new String[prods.size()];
-        arr = new int[prods.size()];
+        arr = new Bitmap[prods.size()];
 
         for (int i = 0; i < prods.size(); i++) {
             productNames[i] = prods.get(i).getName();
             productDescriptions[i] = prods.get(i).getDesc();
-            arr[i] = R.drawable.test;
+            arr[i] = prods.get(i).getImage();
 
         }
 
-        //String[] productItems = {"Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple", "Banana", "Orange", "Apple"};
         ListView list = (ListView) view.findViewById(R.id.listView);
 
-//        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(
-//          getActivity(), android.R.layout.simple_list_item_1, productItems);
+
 
         productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
         list.setAdapter(adapter);
@@ -75,8 +74,6 @@ public class Fragment_ProductView extends Fragment {
             }
         });
 
-        // TODO: WORK ON CREATING AN ONCLICKLISTENER FOR EACH LISTVIEW
-
         return view;
     }
 }
@@ -84,10 +81,10 @@ public class Fragment_ProductView extends Fragment {
 class productAdapter extends ArrayAdapter<String>
 {
     Context context;
-    int[] images;
+    Bitmap[] images;
     String[] titleArray;
     String[] descriptionArray;
-    productAdapter(Context c, String[] titles, int imgs[], String[] desc)
+    productAdapter(Context c, String[] titles, Bitmap[] imgs, String[] desc)
     {
         super(c, R.layout.single_productview, R.id.textViewTitle, titles);
         this.context = c;
@@ -109,18 +106,15 @@ class productAdapter extends ArrayAdapter<String>
         TextView myTitle = row.findViewById(R.id.textViewTitle);
         TextView myDescription = row.findViewById(R.id.textViewDescription);
 
-        myImage.setImageResource(images[position]);
         myTitle.setText(titleArray[position]);
         myDescription.setText(descriptionArray[position]);
+        if (images[position] == null)
+            myImage.setImageResource(R.drawable.test);
+        else
+            myImage.setImageBitmap(images[position]);
 
         return row;
     }
 
 }
-
-/*
-Intent intent = new Intent(context, ProductPage.class);
-intent.putExtra("prodID", product.getID_at_position)
-*/
-
 
