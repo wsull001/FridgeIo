@@ -109,7 +109,7 @@ class productAdapter extends ArrayAdapter<String>
         myTitle.setText(titleArray[position]);
         myDescription.setText(descriptionArray[position]);
         if (images[position] == null)
-            myImage.setImageResource(R.drawable.test);
+            myImage.setImageResource(R.drawable.ic_food_default);
         else
             myImage.setImageBitmap(images[position]);
 

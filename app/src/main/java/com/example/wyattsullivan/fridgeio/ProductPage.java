@@ -60,7 +60,7 @@ public class ProductPage extends AppCompatActivity {
         if (theProduct.getImage() != null)
             ((ImageView)findViewById(R.id.productPageImageView)).setImageBitmap(theProduct.getImage());
         else
-            ((ImageView)findViewById(R.id.productPageImageView)).setImageResource(R.drawable.test);
+            ((ImageView)findViewById(R.id.productPageImageView)).setImageResource(R.drawable.ic_food_default);
 
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
             public void onStopTrackingTouch(SeekBar seekBar){
