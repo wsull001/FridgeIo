@@ -121,7 +121,26 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
     public boolean deleteProduct(String id) {
-        //TODO: implement delete: entails delete product, make sure update record is correct, delete photo
+        //TODO: implement delete: DELETE PHOTO
+        SQLiteDatabase db = this.getWritableDatabase();
+        int res = db.delete("ProductList", "prodID = '" + id + "'", null);
+        if (res > 0) {
+            //update records in update table
+            Cursor curs = db.rawQuery("SELECT * FROM ToUpdate WHERE prodID = '" + id + "'", null);
+            if (curs.getCount() > 0) {
+                //record already in update table, update it
+                ContentValues cv = new ContentValues();
+                cv.put("type", 2); //mark as delete
+                res = db.update("ToUpdate",cv, "prodID = '" + id + "'", null);
+
+            } else {
+                ContentValues cv = new ContentValues();
+                cv.put("type", 2); //delete
+                cv.put("prodID", id);
+                long res2 = db.insert("ToUpdate", null, cv);
+            }
+        }
+
         return false;
     }
 
@@ -162,7 +181,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
     public boolean updateCapacity(int capacity, String prodID) {
-        //TODO: implement capacity updating
+        //TODO: Finish capacity update
         return false;
     }
 

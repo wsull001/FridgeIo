@@ -3,6 +3,8 @@ package com.example.wyattsullivan.fridgeio;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -18,6 +20,7 @@ public class ProductPage extends AppCompatActivity {
     private TextView name;
     private TextView expDate;
     private TextView addDate;
+    private Button deleteButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +35,7 @@ public class ProductPage extends AppCompatActivity {
         //get the product to display
         dbHelper = new DbHelper(this);
         theProduct = dbHelper.getProductById(prodID);
-
+        deleteButton = (Button) findViewById(R.id.productPageDeleteButton);
         //get the important elements of the view
         seekBar = (SeekBar)findViewById(R.id.capacitySeekBar);
         descriptionBox = (TextView)findViewById(R.id.productPageDescText);
@@ -73,6 +76,15 @@ public class ProductPage extends AppCompatActivity {
             public void onStartTrackingTouch(SeekBar seekBar){}
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){}
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbHelper.deleteProduct(theProduct.getId());
+                Intent intent = new Intent(ProductPage.this, FragmentManagerActivity.class);
+                startActivity(intent);
+            }
         });
     }
 }
