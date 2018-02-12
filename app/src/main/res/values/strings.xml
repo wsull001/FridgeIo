@@ -8,36 +8,7 @@
     <string name="ExpDate">Expiration Date</string>
     <string name="Submit">Submit</string>
     <string name="title_grocerylist">Grocery List</string>
+    <string name="title_settings">Settings</string>
     <string name="title_products">Products</string>
-
-    <string-array name="titles">
-        <item>Product 1</item>
-        <item>Product 2</item>
-        <item>Product 3</item>
-        <item>Product 4</item>
-        <item>Product 5</item>
-        <item>Product 6</item>
-        <item>Product 7</item>
-        <item>Product 8</item>
-        <item>Product 9</item>
-        <item>Product 10</item>
-        <item>Product 11</item>
-        <item>Product 12</item>
-    </string-array>
-
-    <string-array name="descriptions">
-        <item>Description 1</item>
-        <item>Description 2</item>
-        <item>Description 3</item>
-        <item>Description 4</item>
-        <item>Description 5</item>
-        <item>Description 6</item>
-        <item>Description 7</item>
-        <item>Description 8</item>
-        <item>Description 9</item>
-        <item>Description 10</item>
-        <item>Description 11</item>
-        <item>Description 12</item>
-    </string-array>
 
 </resources>

@@ -24,14 +24,14 @@ public class FragmentManagerActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.navigation_products:
 
                     mTextMessage.setText(R.string.title_products);
                     return true;
-                case R.id.navigation_bluetoothconnect:
+                case R.id.navigation_grocerylist:
                     mTextMessage.setText(R.string.title_bluetoothconnect);
                     return true;
-                case R.id.navigation_grocerylist:
+                case R.id.navigation_settings:
                     //Modification to temporarily access Add product activity
                     //Used for debugging/early emulating testing
                     //TODO: Remove this if necessary OR when AddProduct is able to be accessed normally
@@ -60,14 +60,14 @@ public class FragmentManagerActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         Fragment selectedFragment = null;
                         switch (item.getItemId()) {
-                            case R.id.navigation_home:
+                            case R.id.navigation_products:
                                 selectedFragment = Fragment_ProductView.newInstance();
-                                break;
-                            case R.id.navigation_bluetoothconnect:
-                                selectedFragment = Fragment_Bluetooth.newInstance();
                                 break;
                             case R.id.navigation_grocerylist:
                                 selectedFragment = Fragment_GroceryList.newInstance();
+                                break;
+                            case R.id.navigation_settings:
+                                selectedFragment = Fragment_Settings.newInstance();
                                 break;
                         }
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

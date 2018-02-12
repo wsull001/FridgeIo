@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_home" />
-
-    <item
-        android:id="@+id/navigation_bluetoothconnect"
-        android:icon="@drawable/ic_bluetooth_black_24dp"
-        android:title="@string/title_bluetoothconnect" />
+        android:id="@+id/navigation_products"
+        android:icon="@drawable/ic_food_default"
+        android:title="@string/title_products"/>
 
     <item
         android:id="@+id/navigation_grocerylist"
         android:icon="@drawable/ic_local_grocery_store_black_24dp"
         android:title="@string/title_grocerylist" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/title_settings" />
 
 </menu>
