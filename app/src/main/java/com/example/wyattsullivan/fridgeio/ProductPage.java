@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import java.util.Date;
+
 import java.util.Calendar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
@@ -82,7 +82,7 @@ public class ProductPage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dbHelper.deleteProduct(theProduct.getId());
-                Intent intent = new Intent(ProductPage.this, FragmentManagerActivity.class);
+                Intent intent = new Intent(ProductPage.this, FragmentManagerProduct.class);
                 startActivity(intent);
             }
         });

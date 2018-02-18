@@ -10,5 +10,6 @@
     <string name="title_grocerylist">Grocery List</string>
     <string name="title_settings">Settings</string>
     <string name="title_products">Products</string>
+    <string name="title_refrigerators">Refrigerators</string>
 
 </resources>

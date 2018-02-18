@@ -12,7 +12,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -20,10 +19,7 @@ import android.util.Log;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,11 +27,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Date;
-import java.util.List;
 
-import static android.Manifest.*;
 import static android.Manifest.permission.*;
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class Add_product extends AppCompatActivity {
     //Widget Variables
@@ -85,7 +78,7 @@ public class Add_product extends AppCompatActivity {
         cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goHome = new Intent(Add_product.this, FragmentManagerActivity.class);
+                Intent goHome = new Intent(Add_product.this, FragmentManagerProduct.class);
                 startActivity(goHome);
             }
         });
@@ -167,7 +160,7 @@ public class Add_product extends AppCompatActivity {
 
 
 
-                    Intent goHome = new Intent(Add_product.this, FragmentManagerActivity.class);
+                    Intent goHome = new Intent(Add_product.this, FragmentManagerProduct.class);
                     startActivity(goHome);
             }
         }

@@ -9,14 +9,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 import android.widget.TextView;
 
-public class FragmentManagerActivity extends AppCompatActivity {
+public class FragmentManagerProduct extends AppCompatActivity {
 
-    private ListView productListView;
     private TextView mTextMessage;
-    private DbHelper mydb;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -25,18 +22,13 @@ public class FragmentManagerActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_products:
-
                     mTextMessage.setText(R.string.title_products);
                     return true;
                 case R.id.navigation_grocerylist:
-                    mTextMessage.setText(R.string.title_bluetoothconnect);
+                    mTextMessage.setText(R.string.title_grocerylist);
                     return true;
                 case R.id.navigation_settings:
-                    //Modification to temporarily access Add product activity
-                    //Used for debugging/early emulating testing
-                    //TODO: Remove this if necessary OR when AddProduct is able to be accessed normally
-                    startActivity(new Intent(FragmentManagerActivity.this,Add_product.class));
-                    mTextMessage.setText(R.string.title_grocerylist);
+                    mTextMessage.setText(R.string.title_settings);
                     return true;
             }
             return false;
@@ -46,12 +38,10 @@ public class FragmentManagerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment_manager);
-
-        mydb = new DbHelper(this);
+        setContentView(R.layout.activity_fragment_manager_product);
 
         mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.product_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         navigation.setOnNavigationItemSelectedListener
@@ -71,14 +61,14 @@ public class FragmentManagerActivity extends AppCompatActivity {
                                 break;
                         }
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.frame_layout, selectedFragment);
+                        transaction.replace(R.id.frame_layout_product, selectedFragment);
                         transaction.commit();
                         return true;
                     }
                 });
         //Manually displaying the first fragment - one time only
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_layout, Fragment_ProductView.newInstance());
+        transaction.replace(R.id.frame_layout_product, Fragment_ProductView.newInstance());
         transaction.commit();
     }
 
