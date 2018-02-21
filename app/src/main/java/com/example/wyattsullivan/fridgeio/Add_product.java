@@ -50,11 +50,15 @@ public class Add_product extends AppCompatActivity {
     int expYear;
     int expMonth;
     int expDay;
+    String fridgeID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
+
+
+        fridgeID = getIntent().getStringExtra("FridgeID");
 
 
         //set the bitmap to null by default
@@ -79,6 +83,7 @@ public class Add_product extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent goHome = new Intent(Add_product.this, FragmentManagerProduct.class);
+                goHome.putExtra("FridgeID", fridgeID);
                 startActivity(goHome);
             }
         });
@@ -146,6 +151,7 @@ public class Add_product extends AppCompatActivity {
                     product.setName(productname);
                     product.setExpirationDate(exDate);
                     product.setDateAdded(Calendar.getInstance().getTime());
+                    product.setFridgeID(fridgeID);
                     product.setDescription(desc);
                     product.setCapacity(100);
                     product.setImage(bitmap);
@@ -161,6 +167,7 @@ public class Add_product extends AppCompatActivity {
 
 
                     Intent goHome = new Intent(Add_product.this, FragmentManagerProduct.class);
+                    goHome.putExtra("FridgeID", fridgeID);
                     startActivity(goHome);
             }
         }
@@ -226,17 +233,17 @@ public class Add_product extends AppCompatActivity {
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
-        }
+        } else {
 
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, CAMERA);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, CAMERA);
+        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("TAG", "--------------------------->" );
         if (resultCode == this.RESULT_CANCELED) {
             return;
         }
@@ -262,35 +269,5 @@ public class Add_product extends AppCompatActivity {
             bitmap = thumbnail;
         }
     }
-
-    //Commented out for now, trying db style
-    //TODO: remove completely if decide to
-    /*public String saveImage(Bitmap myBitmap) {
-        File directory = new File(
-                Environment.getExternalStorageDirectory() + IMAGE_DIRECTORY);
-
-        Log.d("TAG", "File Saved::--->" + directory.getAbsolutePath());
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        try {
-            String s = new String (Calendar.getInstance().getTimeInMillis() + ".jpg");
-            File f = new File(directory, Calendar.getInstance().getTimeInMillis() + ".jpg");
-            f.createNewFile();
-            FileOutputStream fo = new FileOutputStream(f);
-
-            myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, fo);
-
-            fo.flush();
-            fo.close();
-            Log.d("TAG", "File Saved::--->" + f.getAbsolutePath());
-
-            return f.getAbsolutePath();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        return "";
-    }*/
 
 }

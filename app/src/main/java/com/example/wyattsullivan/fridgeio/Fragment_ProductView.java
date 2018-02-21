@@ -28,6 +28,7 @@ public class Fragment_ProductView extends Fragment {
     private String[] productNames;
     private String[] productDescriptions;
     private Bitmap[] arr;
+    private String fridgeID;
     ArrayList<Product> prods;
     DbHelper dbHelp;
 
@@ -41,10 +42,12 @@ public class Fragment_ProductView extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_productview, container, false);
+        fridgeID = getActivity().getIntent().getStringExtra("FridgeID");
+
 
         dbHelp = new DbHelper(getActivity());
 
-        prods = dbHelp.getProductsByDateAdded();
+        prods = dbHelp.getProductsByDateAdded(fridgeID);
         if (prods == null) return view;
         productNames = new String[prods.size()];
         productDescriptions = new String[prods.size()];

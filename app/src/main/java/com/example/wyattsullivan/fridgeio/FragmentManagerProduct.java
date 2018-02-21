@@ -74,7 +74,7 @@ public class FragmentManagerProduct extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+        getMenuInflater().inflate(R.menu.action_bar_menu_w_home, menu);
         return true;
     }
 
@@ -82,8 +82,13 @@ public class FragmentManagerProduct extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.add_button) {
+        if (id == R.id.add_button_product) {
             Intent intent = new Intent(this, Add_product.class);
+            intent.putExtra("FridgeID", getIntent().getStringExtra("FridgeID"));
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.home_button) {
+            Intent intent = new Intent(this, FragmentManagerFridge.class);
             startActivity(intent);
             return true;
         }

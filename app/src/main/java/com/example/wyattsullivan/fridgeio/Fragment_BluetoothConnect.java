@@ -32,8 +32,7 @@ public class Fragment_BluetoothConnect extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), FragmentManagerProduct.class);
-                startActivity(intent);
+
             }
         });
         return v;
