@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -43,6 +42,7 @@ public class Fragment_FridgeView extends Fragment {
         DbHelper dbHelp = new DbHelper(getContext());
 
         FridgeList fridgeList = dbHelp.getFridges();
+        if(fridgeList == null) return view;
         keys = fridgeList.getIds();
 
 
