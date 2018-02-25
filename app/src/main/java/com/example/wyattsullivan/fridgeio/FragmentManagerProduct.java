@@ -24,9 +24,6 @@ public class FragmentManagerProduct extends AppCompatActivity {
                 case R.id.navigation_products:
                     mTextMessage.setText(R.string.title_products);
                     return true;
-                case R.id.navigation_grocerylist:
-                    mTextMessage.setText(R.string.title_grocerylist);
-                    return true;
                 case R.id.navigation_settings:
                     mTextMessage.setText(R.string.title_settings);
                     return true;
@@ -52,9 +49,6 @@ public class FragmentManagerProduct extends AppCompatActivity {
                         switch (item.getItemId()) {
                             case R.id.navigation_products:
                                 selectedFragment = Fragment_ProductView.newInstance();
-                                break;
-                            case R.id.navigation_grocerylist:
-                                selectedFragment = Fragment_GroceryList.newInstance();
                                 break;
                             case R.id.navigation_settings:
                                 selectedFragment = Fragment_Settings.newInstance();

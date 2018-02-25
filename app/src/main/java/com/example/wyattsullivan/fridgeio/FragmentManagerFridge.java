@@ -29,6 +29,9 @@ public class FragmentManagerFridge extends AppCompatActivity {
                 case R.id.navigation_bluetooth:
                     mTextMessage.setText(R.string.title_bluetoothconnect);
                     return true;
+                case R.id.navigation_grocerylist:
+                    mTextMessage.setText(R.string.title_grocerylist);
+                    return true;
             }
             return false;
         }
@@ -73,6 +76,9 @@ public class FragmentManagerFridge extends AppCompatActivity {
                                 break;
                             case R.id.navigation_bluetooth:
                                 selectedFragment = Fragment_BluetoothConnect.newInstance();
+                                break;
+                            case R.id.navigation_grocerylist:
+                                selectedFragment = Fragment_GroceryList.newInstance();
                                 break;
                         }
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

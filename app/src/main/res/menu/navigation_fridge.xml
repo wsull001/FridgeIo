@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_bluetooth_black_24dp"
         android:title="@string/title_bluetoothconnect" />
 
+    <item
+        android:id="@+id/navigation_grocerylist"
+        android:icon="@drawable/ic_local_grocery_store_black_24dp"
+        android:title="@string/title_grocerylist" />
+
 </menu>
