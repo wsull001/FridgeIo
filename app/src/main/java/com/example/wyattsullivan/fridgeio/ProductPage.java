@@ -1,6 +1,9 @@
 package com.example.wyattsullivan.fridgeio;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -101,11 +104,68 @@ public class ProductPage extends AppCompatActivity {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbHelper.deleteProduct(theProduct.getId());
-                Intent intent = new Intent(ProductPage.this, FragmentManagerProduct.class);
-                intent.putExtra("FridgeID", theProduct.getFridgeID());
-                startActivity(intent);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ProductPage.this);
+                builder.setMessage("Delete Item or Move to Grocery List?");
+                builder.setPositiveButton("Move to Grocery List", new deleteAndAddToGroceryList(ProductPage.this, theProduct.getId(), theProduct));
+                /*
+                // Implement cancel button after
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+                */
+                builder.setNeutralButton("Delete", new deleteProductButton(ProductPage.this, theProduct));
+                builder.setCancelable(true);
+                builder.create();
+                builder.show();
             }
         });
+    }
+}
+
+class deleteAndAddToGroceryList implements DialogInterface.OnClickListener {
+
+    Context context;
+    String prod_id;
+    String groceryItem;
+    String fridgeID;
+    deleteAndAddToGroceryList(Context c, String id, Product theProduct) {
+        context = c;
+        prod_id = id;
+        groceryItem = theProduct.getName();
+        fridgeID = theProduct.getFridgeID();
+    }
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+        DbHelper dbHelper = new DbHelper(context);
+        dbHelper.deleteProduct(prod_id);
+        dbHelper.addGroceryItem(groceryItem);
+        Intent intent = new Intent(context, FragmentManagerProduct.class);
+        intent.putExtra("FridgeID", fridgeID);
+        context.startActivity(intent);
+        dialogInterface.dismiss();
+    }
+}
+
+class deleteProductButton implements DialogInterface.OnClickListener {
+
+    Context context;
+    String prod_id;
+    String fridgeID;
+    deleteProductButton(Context c, Product theProduct) {
+        context = c;
+        prod_id = theProduct.getId();
+        fridgeID = theProduct.getFridgeID();
+    }
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+        DbHelper dbHelper = new DbHelper(context);
+        dbHelper.deleteProduct(prod_id);
+        Intent intent = new Intent(context, FragmentManagerProduct.class);
+        intent.putExtra("FridgeID", fridgeID);
+        context.startActivity(intent);
+        dialogInterface.dismiss();
     }
 }
