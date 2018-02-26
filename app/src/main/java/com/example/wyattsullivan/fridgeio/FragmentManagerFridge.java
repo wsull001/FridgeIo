@@ -38,6 +38,7 @@ public class FragmentManagerFridge extends AppCompatActivity {
     };
 
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_bar_menu, menu);
@@ -55,6 +56,7 @@ public class FragmentManagerFridge extends AppCompatActivity {
         }
         return false;
     }
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
