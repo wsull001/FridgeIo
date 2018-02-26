@@ -18,6 +18,7 @@ public class Product {
     private String id;
     private String fridgeID;
     private Bitmap bmap;
+    private boolean isCapacity;
 
 
     public Product() {
@@ -27,6 +28,7 @@ public class Product {
         capacity = -1;
         id = null;
         bmap = null;
+        isCapacity = true;
     }
 
     public void setFridgeID(String fid) {
@@ -91,4 +93,13 @@ public class Product {
     public Bitmap getImage() {
         return bmap;
     }
+
+    public void setIsCapacity(boolean b) {
+        isCapacity = b;
+    }
+
+    public boolean isCapacity() {
+        return isCapacity;
+    }
+
 }

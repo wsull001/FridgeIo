@@ -19,6 +19,9 @@ import java.util.ArrayList;
 
 public class DbHelper extends SQLiteOpenHelper {
     public static final String dbName = "FridgeIo.db";
+                                                //0       //1     //2         //3            //4         //5        //6          //7      //8
+    private static final String productItems = "P.prodID, P.name, P.FridgeID, P.description, P.fullness, P.expDate, P.dateAdded, P.image, P.isCapacity";
+
     private Context ctxt;
 
     public static byte[] bitmapToBytes(Bitmap bMap) {
@@ -46,7 +49,7 @@ public class DbHelper extends SQLiteOpenHelper {
                                                             "description TEXT," +
                                                             "fullness INTEGER," +
                                                             "expDate DATE, dateAdded DATE," +
-                                                            "image BLOB)");
+                                                            "image BLOB, isCapacity INTEGER)"); //isCapacity 0-quantity 1-capacity
         //1-new, 2-delete, 3-updated
         db.execSQL("CREATE TABLE IF NOT EXISTS ToUpdate (updateID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                          "type INTEGER, " +
@@ -101,6 +104,7 @@ public class DbHelper extends SQLiteOpenHelper {
         } else {
             cv.putNull("image");
         }
+        cv.put("isCapacity", (prod.isCapacity() ? 1 : 0));
         cv.put("prodID", key);
         cv.put("name", prod.getName());
         cv.put("FridgeID", prod.getFridgeID());
@@ -178,6 +182,8 @@ public class DbHelper extends SQLiteOpenHelper {
             if (img != null) {
                 p.setImage(bytesToBitmap(img));
             }
+
+            p.setIsCapacity((cursor.getInt(8) == 1));
             ret.add(p);
 
         }
@@ -195,7 +201,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public Product getProductById(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT P.prodID, P.name, P.FridgeID, P.description, P.fullness, P.expDate, P.dateAdded, P.image FROM ProductList P WHERE P.prodID = '" + id + "'",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE P.prodID = '" + id + "'",
                 null);
 
         if (curs.getCount() == 0)
@@ -206,7 +212,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByDateAdded(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT P.prodID, P.name, P.FridgeID, P.description, P.fullness, P.expDate, P.dateAdded, P.image FROM ProductList P WHERE FridgeID = '" + fridgeID + "' ORDER BY dateAdded",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE FridgeID = '" + fridgeID + "' ORDER BY dateAdded",
                 null);
         if (curs.getCount() == 0)
             return null;
@@ -215,7 +221,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByExpDate(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT P.prodID, P.name, P.FridgeID, P.description, P.fullness, P.expDate, P.dateAdded, P.image FROM ProductList P  ORDER BY expDate",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P  ORDER BY expDate",
                 null);
         if (curs.getCount() == 0)
             return null;
