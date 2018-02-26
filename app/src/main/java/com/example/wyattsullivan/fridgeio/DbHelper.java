@@ -266,15 +266,17 @@ public class DbHelper extends SQLiteOpenHelper {
         int index = 0;
         while (curs.moveToNext()) {
             ret[index] = new GroceryItem(curs.getString(1),(curs.getInt(3) == 1));
-            ret[index].setId(curs.getInt(1));
+            ret[index].setId(curs.getInt(0));
+            index++;
         }
         return ret;
     }
 
-    public void deleteGroceryItem(int id) {
+    public boolean deleteGroceryItem(int id) {
         SQLiteDatabase db = getWritableDatabase();
 
-        db.delete("GroceryList", "grocID = " + id, null);
+        long result = db.delete("GroceryList", "grocID = " + id, null);
+        return (result != -1);
     }
 
     @Override

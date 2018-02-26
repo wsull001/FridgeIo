@@ -38,7 +38,10 @@ public class Fragment_GroceryList extends Fragment {
     GroceryItem[] groceries;
     String[] grocery_names;
     productAdapterGrocery adapter;
+    ListView list;
     String mAddGrocery;
+    TextView emptyList;
+    boolean wasInvisible;
 
     public static Fragment_GroceryList newInstance() {
         Fragment_GroceryList fragment = new Fragment_GroceryList();
@@ -80,6 +83,23 @@ public class Fragment_GroceryList extends Fragment {
                     // TODO: WHEN ADDING FIRST ITEM, CRASHES BECAUSE NULL OBJECT REFERENCE. ON RESTART, THE PRODUCT NAME IS THERE
                     // TODO: WHEN ADDING NEW GROCERY ITEMS, ALL OTHER ITEMS BECOME NULL FOR SOME REASON
                     dbHelp.addGroceryItem(mAddGrocery);
+                    groceries = dbHelp.getGroceryItems();
+                    grocery_names = new String[groceries.length];
+                    // TODO: WHEN INITIALIZING NAME LIST, MUST MAKE EXCEPTION FOR ALL NULL STRINGS. DOES NOT SAVE PROPERLY??
+                    for(int i = 0; i < groceries.length; i++)
+                    {
+                        if(groceries[i] == null)
+                            grocery_names[i] = "NULL";
+                        else {
+                            grocery_names[i] = groceries[i].getName();
+                        }
+                    }
+                    if (wasInvisible) {
+                        emptyList.setVisibility(View.INVISIBLE);
+                        wasInvisible = false;
+                        list.setVisibility(View.VISIBLE);
+                    }
+                    adapter.changeGroceryItemsList(grocery_names);
                     adapter.notifyDataSetChanged();
                 }
             });
@@ -103,8 +123,9 @@ public class Fragment_GroceryList extends Fragment {
 
 
         View view = inflater.inflate(R.layout.fragment_grocerylist, container, false);
-        ListView list = (ListView) view.findViewById(R.id.listViewGrocery);
-        TextView emptyList = (TextView) view.findViewById(R.id.emptyElement);
+        list = (ListView) view.findViewById(R.id.listViewGrocery);
+        emptyList = (TextView) view.findViewById(R.id.emptyElement);
+        wasInvisible = false;
 
         dbHelp = new DbHelper(getActivity());
         groceries = dbHelp.getGroceryItems();
@@ -112,7 +133,8 @@ public class Fragment_GroceryList extends Fragment {
         // Shows empty list message if length is 0 (nothing in array)
         if(groceries.length == 0) {
             emptyList.setVisibility(View.VISIBLE);
-            return view;
+            list.setVisibility(View.INVISIBLE);
+            wasInvisible = true;
         }
         grocery_names = new String[groceries.length];
         // TODO: WHEN INITIALIZING NAME LIST, MUST MAKE EXCEPTION FOR ALL NULL STRINGS. DOES NOT SAVE PROPERLY??
@@ -126,20 +148,38 @@ public class Fragment_GroceryList extends Fragment {
         }
 
         adapter = new productAdapterGrocery(getActivity(), grocery_names);
-
         list.setAdapter(adapter);
 
         // TODO: MAKE ONCLICK LISTENER FOR LISTVIEW TO HAVE DIALOG BOX POPUP TO EDIT TEXT OR EDIT TEXT IN LISTVIEW
-        /*
+
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                showInputBox(rand_list.get(position), position);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage("Delete Item?");
+                builder.setPositiveButton("Delete", new MyDeleteButton(groceries[position].getId(), getActivity(), Fragment_GroceryList.this));
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.create().show();
             }
         });
-        */
+
 
         return view;
+    }
+    public void updateGroceryItems() {
+        DbHelper dbHelp = new DbHelper(getActivity());
+        groceries = dbHelp.getGroceryItems();
+        grocery_names = new String[groceries.length];
+        for (int i = 0; i < groceries.length; i++) {
+            grocery_names[i] = groceries[i].getName();
+        }
+        adapter.changeGroceryItemsList(grocery_names);
+        adapter.notifyDataSetChanged();
     }
 }
 
@@ -154,6 +194,16 @@ class productAdapterGrocery extends ArrayAdapter<String>
         this.context = c;
         this.groceryItemsList = titles;
     }
+
+    @Override public int getCount() {
+        return groceryItemsList.length;
+    }
+
+
+    public void changeGroceryItemsList(String[] newList) {
+        groceryItemsList = newList;
+    }
+
 
     @NonNull
     @Override
@@ -172,3 +222,22 @@ class productAdapterGrocery extends ArrayAdapter<String>
 
 }
 
+
+class MyDeleteButton implements DialogInterface.OnClickListener {
+
+    private int itemId;
+    private Context ctxt;
+    Fragment_GroceryList parent;
+    MyDeleteButton(int itId, Context context, Fragment_GroceryList p) {
+        itemId = itId;
+        ctxt = context;
+        parent = p;
+    }
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        DbHelper mydbHelp = new DbHelper(ctxt);
+        mydbHelp.deleteGroceryItem(itemId);
+        parent.updateGroceryItems();
+        dialog.dismiss();
+    }
+}
