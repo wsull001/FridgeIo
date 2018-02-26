@@ -3,7 +3,9 @@ package com.example.wyattsullivan.fridgeio;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,8 +58,8 @@ public class DbHelper extends SQLiteOpenHelper {
                                                          "prodID CHAR(30))");
         db.execSQL("CREATE TABLE IF NOT EXISTS GroceryList (grocID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                             "name TEXT, " +
-                                                            "quantity INT, " +
-                                                            "notes TEXT)");
+                                                            "quantity INTEGER, " +
+                                                            "isChecked INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Fridge (fridgeID CHAR(30) PRIMARY KEY, " +
                 "fname TEXT)");
@@ -244,6 +246,36 @@ public class DbHelper extends SQLiteOpenHelper {
         return ret;
     }
 
+    public void addGroceryItem(String name) {
+
+        ContentValues cv = new ContentValues();
+
+        cv.put("name", name);
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.insert("GroceryList", null, cv);
+
+    }
+
+    public GroceryItem[] getGroceryItems() {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM GroceryList", null);
+        int num = curs.getCount();
+        GroceryItem[] ret = new GroceryItem[num];
+        int index = 0;
+        while (curs.moveToNext()) {
+            ret[index] = new GroceryItem(curs.getString(1),(curs.getInt(3) == 1));
+            ret[index].setId(curs.getInt(1));
+        }
+        return ret;
+    }
+
+    public void deleteGroceryItem(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.delete("GroceryList", "grocID = " + id, null);
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
