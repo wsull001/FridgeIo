@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -21,6 +22,21 @@ public class ProductPage extends AppCompatActivity {
     private TextView expDate;
     private TextView addDate;
     private Button deleteButton;
+    private EditText quantity;
+
+    private void setUpCapacity() {
+        if (theProduct.isCapacity()) {
+            quantity.setVisibility(View.INVISIBLE);
+        } else {
+            findViewById(R.id.capacitySeekBar).setVisibility(View.INVISIBLE);
+            findViewById(R.id.textView6).setVisibility(View.INVISIBLE);
+            ((TextView)findViewById(R.id.textView7)).setText("Quantity");
+            findViewById(R.id.textView8).setVisibility(View.INVISIBLE);
+            quantity.setText("" + theProduct.getCapacity());
+            quantity.clearFocus();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +58,10 @@ public class ProductPage extends AppCompatActivity {
         name = (TextView) findViewById(R.id.productPageName);
         expDate = (TextView) findViewById(R.id.productPageExpDate);
         addDate = (TextView) findViewById(R.id.productPageAddDate);
+
+        //set up capacity
+        quantity = (EditText) findViewById(R.id.quantityValue);
+        setUpCapacity();
 
         //Set the fields to be the product information that we need to appear
         name.setText(theProduct.getName());

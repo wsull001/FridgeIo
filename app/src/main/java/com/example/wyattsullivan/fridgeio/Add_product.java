@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.app.AlertDialog;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.Date;
 
@@ -41,6 +43,8 @@ public class Add_product extends AppCompatActivity {
     Button cancelButton;
     EditText name;
     EditText Description;
+    ToggleButton capQuant;
+    EditText itemQuant;
 
     private static final String IMAGE_DIRECTORY = "/productImage";
     private int GALLERY = 1, CAMERA = 2;
@@ -56,6 +60,23 @@ public class Add_product extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
+
+        itemQuant = (EditText) findViewById(R.id.itemQuantity);
+
+        itemQuant.setVisibility(View.INVISIBLE);
+
+
+        capQuant = (ToggleButton) findViewById(R.id.toggleCapQuant);
+        capQuant.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) { //quantity
+                    Add_product.this.findViewById(R.id.itemQuantity).setVisibility(View.VISIBLE);
+                } else { //capacity
+                    Add_product.this.findViewById(R.id.itemQuantity).setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
 
         fridgeID = getIntent().getStringExtra("FridgeID");
@@ -153,8 +174,13 @@ public class Add_product extends AppCompatActivity {
                     product.setDateAdded(Calendar.getInstance().getTime());
                     product.setFridgeID(fridgeID);
                     product.setDescription(desc);
-                    product.setCapacity(100);
+                    if (capQuant.isChecked()) {
+                        product.setCapacity(Integer.parseInt(itemQuant.getText().toString()));
+                    } else {
+                        product.setCapacity(100);
+                    }
                     product.setImage(bitmap);
+                    product.setIsCapacity(!capQuant.isChecked());
 
                     //Debugging Output
                     //Outputs simple information drawn from the product to ensure the product
