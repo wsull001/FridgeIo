@@ -83,6 +83,7 @@ public class ProductPage extends AppCompatActivity {
             public void onClick(View v) {
                 dbHelper.deleteProduct(theProduct.getId());
                 Intent intent = new Intent(ProductPage.this, FragmentManagerProduct.class);
+                intent.putExtra("FridgeID", theProduct.getFridgeID());
                 startActivity(intent);
             }
         });
