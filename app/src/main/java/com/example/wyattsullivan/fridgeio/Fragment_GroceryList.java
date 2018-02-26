@@ -4,15 +4,11 @@ package com.example.wyattsullivan.fridgeio;
  * Created by samhwang on 1/30/18.
  */
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.Context;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SyncStats;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,7 +26,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -39,11 +34,9 @@ import java.util.List;
 
 public class Fragment_GroceryList extends Fragment {
 
-    private String[] groceries = new String[] {
-            "fddad", "dfdafdaf", "dfdadfa"
-    };
-
-    List<String> rand_list;
+    DbHelper dbHelp;
+    GroceryItem[] groceries;
+    String[] grocery_names;
     productAdapterGrocery adapter;
     String mAddGrocery;
 
@@ -82,15 +75,17 @@ public class Fragment_GroceryList extends Fragment {
             builder.setView(mView);
             builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialogInterface, int id) {
                     mAddGrocery = new_grocery.getText().toString();
-                    rand_list.add(mAddGrocery);
+                    // TODO: WHEN ADDING FIRST ITEM, CRASHES BECAUSE NULL OBJECT REFERENCE. ON RESTART, THE PRODUCT NAME IS THERE
+                    // TODO: WHEN ADDING NEW GROCERY ITEMS, ALL OTHER ITEMS BECOME NULL FOR SOME REASON
+                    dbHelp.addGroceryItem(mAddGrocery);
                     adapter.notifyDataSetChanged();
                 }
             });
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialogInterface, int id) {
                     dialogInterface.cancel();
                 }
             });
@@ -108,19 +103,32 @@ public class Fragment_GroceryList extends Fragment {
 
 
         View view = inflater.inflate(R.layout.fragment_grocerylist, container, false);
-
-        rand_list = new ArrayList<String>(Arrays.asList(groceries));
-
         ListView list = (ListView) view.findViewById(R.id.listViewGrocery);
         TextView emptyList = (TextView) view.findViewById(R.id.emptyElement);
 
-        adapter = new productAdapterGrocery(getActivity(), rand_list);
+        dbHelp = new DbHelper(getActivity());
+        groceries = dbHelp.getGroceryItems();
 
-        // Shows empty list message if adapter count is 0 (nothing in list)
-        if(adapter.getCount() == 0) {
+        // Shows empty list message if length is 0 (nothing in array)
+        if(groceries.length == 0) {
             emptyList.setVisibility(View.VISIBLE);
+            return view;
         }
+        grocery_names = new String[groceries.length];
+        // TODO: WHEN INITIALIZING NAME LIST, MUST MAKE EXCEPTION FOR ALL NULL STRINGS. DOES NOT SAVE PROPERLY??
+        for(int i = 0; i < groceries.length; i++)
+        {
+            if(groceries[i] == null)
+                grocery_names[i] = "NULL";
+            else {
+                grocery_names[i] = groceries[i].getName();
+            }
+        }
+
+        adapter = new productAdapterGrocery(getActivity(), grocery_names);
+
         list.setAdapter(adapter);
+
         // TODO: MAKE ONCLICK LISTENER FOR LISTVIEW TO HAVE DIALOG BOX POPUP TO EDIT TEXT OR EDIT TEXT IN LISTVIEW
         /*
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -139,8 +147,8 @@ public class Fragment_GroceryList extends Fragment {
 class productAdapterGrocery extends ArrayAdapter<String>
 {
     Context context;
-    List<String> groceryItemsList;
-    productAdapterGrocery(Context c, List<String> titles)
+    String[] groceryItemsList;
+    productAdapterGrocery(Context c, String[] titles)
     {
         super(c, R.layout.single_grocerylistview, R.id.groceryTitle, titles);
         this.context = c;
@@ -157,7 +165,7 @@ class productAdapterGrocery extends ArrayAdapter<String>
 
         TextView myTitle = row.findViewById(R.id.groceryTitle);
 
-        myTitle.setText(groceryItemsList.get(position));
+        myTitle.setText(groceryItemsList[position]);
 
         return row;
     }
