@@ -107,16 +107,13 @@ public class ProductPage extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ProductPage.this);
                 builder.setMessage("Delete Item or Move to Grocery List?");
                 builder.setPositiveButton("Move to Grocery List", new deleteAndAddToGroceryList(ProductPage.this, theProduct.getId(), theProduct));
-                /*
-                // Implement cancel button after
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Delete", new deleteProductButton(ProductPage.this, theProduct));
+                builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
                     }
                 });
-                */
-                builder.setNeutralButton("Delete", new deleteProductButton(ProductPage.this, theProduct));
                 builder.setCancelable(true);
                 builder.create();
                 builder.show();
