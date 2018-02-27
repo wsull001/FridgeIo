@@ -15,5 +15,8 @@
     <string name="new_grocery_item">New Item</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
+    <string name="new_product_entry_title">New Product Entry</string>
+    <string name="new_fridge_entry_title">New Fridge Entry</string>
+    <string name="new_fridge_item">New Fridge</string>
 
 </resources>

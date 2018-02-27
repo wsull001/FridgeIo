@@ -4,7 +4,9 @@ package com.example.wyattsullivan.fridgeio;
  * Created by samhwang on 2/16/18.
  */
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,18 +20,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 public class Fragment_FridgeView extends Fragment {
 
+    DbHelper dbHelp;
     private String[] keys;
+    String[] fridge_names;
+    fridgeAdapter adapter;
+    FridgeList fridgeList;
+    String mAddFridge;
+    ListView list;
+    TextView emptyList;
 
     public static Fragment_FridgeView newInstance() {
         Fragment_FridgeView fragment = new Fragment_FridgeView();
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,27 +57,74 @@ public class Fragment_FridgeView extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.add_button) {
-            Intent intent = new Intent(getActivity(), AddFridge.class);
-            startActivity(intent);
+            // builds Alert Dialog in current activity
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            // inflates dialog_newfridgeitem activity
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View mView = inflater.inflate(R.layout.dialog_newfridgeitem, null);
+
+            // gets editText entry and populates it to fridge list
+            // cancels dialog if cancel button
+            final EditText new_fridge = (EditText) mView.findViewById(R.id.new_fridge);
+            builder.setView(mView);
+            builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                    mAddFridge = new_fridge.getText().toString();
+                    dbHelp.createFridge(mAddFridge);
+                    fridgeList = dbHelp.getFridges();
+                    if (fridgeList == null) {
+                        emptyList.setVisibility(View.VISIBLE);
+                        list.setVisibility(View.INVISIBLE);
+                    }
+                    else {
+                        emptyList.setVisibility(View.INVISIBLE);
+                        list.setVisibility(View.VISIBLE);
+                        fridge_names = fridgeList.getNames();
+                        keys = fridgeList.getIds();
+                    }
+                    adapter.changeFridgeList(fridge_names);
+                    adapter.notifyDataSetChanged();
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                    dialogInterface.cancel();
+                }
+            });
+
+            builder.create();
+            builder.show();
+
             return true;
         }
-        return false;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_fridgeview, container, false);
+        list = (ListView) view.findViewById(R.id.listViewFridge);
+        emptyList = (TextView) view.findViewById(R.id.emptyElementFridge);
 
-        DbHelper dbHelp = new DbHelper(getContext());
+        dbHelp = new DbHelper(getActivity());
 
-        FridgeList fridgeList = dbHelp.getFridges();
-        if(fridgeList == null) return view;
-        keys = fridgeList.getIds();
-
-
-        ListView list = (ListView) view.findViewById(R.id.listViewFridge);
-
+        fridgeList = dbHelp.getFridges();
+        if(fridgeList == null) {
+            // must initialize empty string array
+            fridge_names = new String[0];
+            keys = new String[0];
+            emptyList.setVisibility(View.VISIBLE);
+            list.setVisibility(View.INVISIBLE);
+        }
+        else {
+            fridge_names = fridgeList.getNames();
+            keys = fridgeList.getIds();
+        }
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -79,24 +135,31 @@ public class Fragment_FridgeView extends Fragment {
             }
         });
 
-        fridgeAdapter adapter = new fridgeAdapter(getActivity(), fridgeList.getNames());
+        adapter = new fridgeAdapter(getActivity(), fridge_names);
         list.setAdapter(adapter);
 
         return view;
+        // TODO: Add functionality to delete fridge (swipe right to delet)
     }
 }
 
 class fridgeAdapter extends ArrayAdapter<String>
 {
     Context context;
-    String[] titleArray;
+    String[] fridgeList;
     fridgeAdapter(Context c, String[] titles)
     {
-        super(c, R.layout.single_productview, R.id.textViewTitle, titles);
+        super(c, R.layout.single_fridgeview, R.id.fridgeTitle, titles);
         this.context = c;
-        this.titleArray = titles;
-
+        this.fridgeList = titles;
     }
+
+    // TODO: Ask Wyatt how he knew to override getCount()
+    @Override public int getCount() {
+        return fridgeList.length;
+    }
+
+    public void changeFridgeList(String[] newList) { fridgeList = newList; }
 
     @NonNull
     @Override
@@ -108,7 +171,7 @@ class fridgeAdapter extends ArrayAdapter<String>
 
         TextView myTitle = row.findViewById(R.id.fridgeTitle);
 
-        myTitle.setText(titleArray[position]);
+        myTitle.setText(fridgeList[position]);
 
         return row;
     }
