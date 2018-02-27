@@ -7,9 +7,6 @@ package com.example.wyattsullivan.fridgeio;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SyncStats;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,15 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Fragment_GroceryList extends Fragment {
 
@@ -41,7 +32,6 @@ public class Fragment_GroceryList extends Fragment {
     ListView list;
     String mAddGrocery;
     TextView emptyList;
-    boolean wasInvisible;
 
     public static Fragment_GroceryList newInstance() {
         Fragment_GroceryList fragment = new Fragment_GroceryList();
@@ -80,23 +70,18 @@ public class Fragment_GroceryList extends Fragment {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int id) {
                     mAddGrocery = new_grocery.getText().toString();
-                    // TODO: WHEN ADDING FIRST ITEM, CRASHES BECAUSE NULL OBJECT REFERENCE. ON RESTART, THE PRODUCT NAME IS THERE
-                    // TODO: WHEN ADDING NEW GROCERY ITEMS, ALL OTHER ITEMS BECOME NULL FOR SOME REASON
                     dbHelp.addGroceryItem(mAddGrocery);
                     groceries = dbHelp.getGroceryItems();
                     grocery_names = new String[groceries.length];
-                    // TODO: WHEN INITIALIZING NAME LIST, MUST MAKE EXCEPTION FOR ALL NULL STRINGS. DOES NOT SAVE PROPERLY??
-                    for(int i = 0; i < groceries.length; i++)
-                    {
-                        if(groceries[i] == null)
-                            grocery_names[i] = "NULL";
-                        else {
+                    for(int i = 0; i < groceries.length; i++) {
                             grocery_names[i] = groceries[i].getName();
-                        }
                     }
-                    if (wasInvisible) {
+                    if (groceries.length == 0) {
+                        emptyList.setVisibility(View.VISIBLE);
+                        list.setVisibility(View.INVISIBLE);
+                    }
+                    else {
                         emptyList.setVisibility(View.INVISIBLE);
-                        wasInvisible = false;
                         list.setVisibility(View.VISIBLE);
                     }
                     adapter.changeGroceryItemsList(grocery_names);
@@ -125,7 +110,6 @@ public class Fragment_GroceryList extends Fragment {
         View view = inflater.inflate(R.layout.fragment_grocerylist, container, false);
         list = (ListView) view.findViewById(R.id.listViewGrocery);
         emptyList = (TextView) view.findViewById(R.id.emptyElement);
-        wasInvisible = false;
 
         dbHelp = new DbHelper(getActivity());
         groceries = dbHelp.getGroceryItems();
@@ -134,17 +118,10 @@ public class Fragment_GroceryList extends Fragment {
         if(groceries.length == 0) {
             emptyList.setVisibility(View.VISIBLE);
             list.setVisibility(View.INVISIBLE);
-            wasInvisible = true;
         }
         grocery_names = new String[groceries.length];
-        // TODO: WHEN INITIALIZING NAME LIST, MUST MAKE EXCEPTION FOR ALL NULL STRINGS. DOES NOT SAVE PROPERLY??
-        for(int i = 0; i < groceries.length; i++)
-        {
-            if(groceries[i] == null)
-                grocery_names[i] = "NULL";
-            else {
+        for(int i = 0; i < groceries.length; i++) {
                 grocery_names[i] = groceries[i].getName();
-            }
         }
 
         adapter = new productAdapterGrocery(getActivity(), grocery_names);
@@ -177,6 +154,14 @@ public class Fragment_GroceryList extends Fragment {
         grocery_names = new String[groceries.length];
         for (int i = 0; i < groceries.length; i++) {
             grocery_names[i] = groceries[i].getName();
+        }
+        if (groceries.length == 0) {
+            emptyList.setVisibility(View.VISIBLE);
+            list.setVisibility(View.INVISIBLE);
+        }
+        else {
+            emptyList.setVisibility(View.INVISIBLE);
+            list.setVisibility(View.VISIBLE);
         }
         adapter.changeGroceryItemsList(grocery_names);
         adapter.notifyDataSetChanged();
