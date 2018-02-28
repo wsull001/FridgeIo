@@ -9,11 +9,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.content.Intent;
-import android.view.Menu;
-import android.app.Activity;
 
 public class Fragment_Settings extends Fragment {
 
@@ -23,7 +18,33 @@ public class Fragment_Settings extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    /* Custom Menu Bar Boilerplate
+     *   Create custom menu xml (or use already existing)
+     *   Populate code below for each button in menu
+     */
+
+    /*
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.***menu activity***, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.***button id***) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

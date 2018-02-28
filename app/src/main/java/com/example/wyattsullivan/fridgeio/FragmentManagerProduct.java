@@ -1,13 +1,11 @@
 package com.example.wyattsullivan.fridgeio;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -65,30 +63,4 @@ public class FragmentManagerProduct extends AppCompatActivity {
         transaction.replace(R.id.frame_layout_product, Fragment_ProductView.newInstance());
         transaction.commit();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.action_bar_menu_w_home, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.add_button_product) {
-            Intent intent = new Intent(this, Add_product.class);
-            intent.putExtra("FridgeID", getIntent().getStringExtra("FridgeID"));
-            startActivity(intent);
-            return true;
-        } else if (id == R.id.home_button) {
-            Intent intent = new Intent(this, FragmentManagerFridge.class);
-            startActivity(intent);
-            return true;
-        }
-        return false;
-    }
-
-
-
 }

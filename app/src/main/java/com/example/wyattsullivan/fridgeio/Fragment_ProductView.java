@@ -6,13 +6,15 @@ package com.example.wyattsullivan.fridgeio;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,6 +41,35 @@ public class Fragment_ProductView extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.action_bar_menu_w_home, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.add_button_product) {
+            Intent intent = new Intent(getActivity(), Add_product.class);
+            intent.putExtra("FridgeID", getActivity().getIntent().getStringExtra("FridgeID"));
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.home_button) {
+            Intent intent = new Intent(getActivity(), FragmentManagerFridge.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_productview, container, false);
@@ -61,8 +92,6 @@ public class Fragment_ProductView extends Fragment {
         }
 
         ListView list = (ListView) view.findViewById(R.id.listView);
-
-
 
         productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
         list.setAdapter(adapter);
@@ -118,6 +147,5 @@ class productAdapter extends ArrayAdapter<String>
 
         return row;
     }
-
 }
 
