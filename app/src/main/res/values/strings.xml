@@ -18,5 +18,7 @@
     <string name="new_grocery_entry_title">New Grocery Entry</string>
     <string name="new_fridge_entry_title">New Fridge Entry</string>
     <string name="new_fridge_item">Fridge Name</string>
+    <string name="edit_grocery_item_title">Edit Grocery Item</string>
+    <string name="edit">Edit</string>
 
 </resources>

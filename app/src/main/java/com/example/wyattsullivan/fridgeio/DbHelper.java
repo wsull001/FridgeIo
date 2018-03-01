@@ -258,6 +258,14 @@ public class DbHelper extends SQLiteOpenHelper {
 
     }
 
+    public boolean editGroceryItem(String newName, int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues newValue = new ContentValues();
+        newValue.put("name", newName);
+        long result = db.update("GroceryList", newValue, "grocID=" + id, null);
+        return (result != -1);
+    }
+
     public GroceryItem[] getGroceryItems() {
         SQLiteDatabase db = getWritableDatabase();
         Cursor curs = db.rawQuery("SELECT * FROM GroceryList", null);

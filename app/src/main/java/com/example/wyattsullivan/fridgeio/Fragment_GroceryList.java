@@ -5,11 +5,13 @@ package com.example.wyattsullivan.fridgeio;
  */
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -104,8 +106,8 @@ public class Fragment_GroceryList extends Fragment {
                 }
             });
 
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            builder.create();
+            builder.show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -177,13 +179,34 @@ public class Fragment_GroceryList extends Fragment {
             }
         });
 
-        // TODO: MAKE ONCLICK LISTENER FOR LISTVIEW TO HAVE DIALOG BOX POPUP TO EDIT TEXT OR EDIT TEXT IN LISTVIEW
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // temporary toast
-                // add dialog to edit text
-                Toast.makeText(getActivity(), "CASE 0", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View mView = inflater.inflate(R.layout.dialog_newitem, null);
+
+                TextView new_edit_title = (TextView) mView.findViewById(R.id.new_title);
+                new_edit_title.setText(R.string.edit_grocery_item_title); // Title: "Edit Grocery Item"
+
+                final EditText new_grocery = (EditText) mView.findViewById(R.id.new_entry);
+                new_grocery.setText(groceries[position].getName());
+                new_grocery.setHint(R.string.grocery_name); // Hint: "Grocery Name"
+                new_grocery.setSelection(new_grocery.getText().length()); // cursor at end of text
+
+                builder.setView(mView);
+
+                // pass EditText to getText on the onClick instead of initialization
+                builder.setPositiveButton(R.string.edit, new MyEditButton(groceries[position].getId(), new_grocery, getActivity(), Fragment_GroceryList.this));
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int id) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                builder.create();
+                builder.show();
             }
         });
 
@@ -247,6 +270,27 @@ class productAdapterGrocery extends ArrayAdapter<String>
         return row;
     }
 
+}
+
+class MyEditButton implements DialogInterface.OnClickListener {
+
+    private int itemId;
+    EditText updateName;
+    private Context ctxt;
+    Fragment_GroceryList parent;
+    MyEditButton(int itId, EditText newName, Context context, Fragment_GroceryList p) {
+        itemId = itId;
+        updateName = newName;
+        ctxt = context;
+        parent = p;
+    }
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        DbHelper mydbHelp = new DbHelper(ctxt);
+        mydbHelp.editGroceryItem(updateName.getText().toString(), itemId);
+        parent.updateGroceryItems();
+        dialog.dismiss();
+    }
 }
 
 class MyDeleteButton implements DialogInterface.OnClickListener {
