@@ -62,11 +62,14 @@ public class Fragment_FridgeView extends Fragment {
 
             // inflates dialog_newfridgeitem activity
             LayoutInflater inflater = getActivity().getLayoutInflater();
-            View mView = inflater.inflate(R.layout.dialog_newfridgeitem, null);
+            View mView = inflater.inflate(R.layout.dialog_newitem, null);
+            TextView new_fridge_title = (TextView) mView.findViewById(R.id.new_title);
+            new_fridge_title.setText(R.string.new_fridge_entry_title); // Title: "New Fridge Entry"
 
             // gets editText entry and populates it to fridge list
             // cancels dialog if cancel button
-            final EditText new_fridge = (EditText) mView.findViewById(R.id.new_fridge);
+            final EditText new_fridge = (EditText) mView.findViewById(R.id.new_entry);
+            new_fridge.setHint(R.string.new_fridge_item); // Hint: "Fridge Name"
             builder.setView(mView);
             builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
                 @Override

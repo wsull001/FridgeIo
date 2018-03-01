@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +29,6 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
-
-import java.util.List;
 
 public class Fragment_GroceryList extends Fragment {
 
@@ -68,13 +65,17 @@ public class Fragment_GroceryList extends Fragment {
             // builds Alert Dialog in current activity
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-            // inflates dialog_newgroceryitem activity
+            // inflates dialog_newitem activity
             LayoutInflater inflater = getActivity().getLayoutInflater();
-            View mView = inflater.inflate(R.layout.dialog_newgroceryitem, null);
+            View mView = inflater.inflate(R.layout.dialog_newitem, null);
+            TextView new_grocery_title = (TextView) mView.findViewById(R.id.new_title);
+            new_grocery_title.setText(R.string.new_grocery_entry_title); // Title: "New Product Entry"
 
             // gets editText entry and populates it to grocery list
             // cancels dialog if cancel button
-            final EditText new_grocery = (EditText) mView.findViewById(R.id.new_grocery);
+            final EditText new_grocery = (EditText) mView.findViewById(R.id.new_entry);
+            new_grocery.setHint(R.string.grocery_name); // Hint: "Grocery Name"
+
             builder.setView(mView);
             builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
                 @Override
@@ -113,7 +114,6 @@ public class Fragment_GroceryList extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
 
         View view = inflater.inflate(R.layout.fragment_grocerylist, container, false);
         listView = view.findViewById(R.id.listViewGrocery);
