@@ -7,6 +7,8 @@ package com.example.wyattsullivan.fridgeio;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +24,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+
+import java.util.List;
 
 public class Fragment_GroceryList extends Fragment {
 
@@ -29,7 +39,7 @@ public class Fragment_GroceryList extends Fragment {
     GroceryItem[] groceries;
     String[] grocery_names;
     productAdapterGrocery adapter;
-    ListView list;
+    SwipeMenuListView listView;
     String mAddGrocery;
     TextView emptyList;
 
@@ -74,15 +84,13 @@ public class Fragment_GroceryList extends Fragment {
                     groceries = dbHelp.getGroceryItems();
                     grocery_names = new String[groceries.length];
                     for(int i = 0; i < groceries.length; i++) {
-                            grocery_names[i] = groceries[i].getName();
+                        grocery_names[i] = groceries[i].getName();
                     }
                     if (groceries.length == 0) {
                         emptyList.setVisibility(View.VISIBLE);
-                        list.setVisibility(View.INVISIBLE);
                     }
                     else {
                         emptyList.setVisibility(View.INVISIBLE);
-                        list.setVisibility(View.VISIBLE);
                     }
                     adapter.changeGroceryItemsList(grocery_names);
                     adapter.notifyDataSetChanged();
@@ -108,7 +116,7 @@ public class Fragment_GroceryList extends Fragment {
 
 
         View view = inflater.inflate(R.layout.fragment_grocerylist, container, false);
-        list = (ListView) view.findViewById(R.id.listViewGrocery);
+        listView = view.findViewById(R.id.listViewGrocery);
         emptyList = (TextView) view.findViewById(R.id.emptyElement);
 
         dbHelp = new DbHelper(getActivity());
@@ -117,34 +125,67 @@ public class Fragment_GroceryList extends Fragment {
         // Shows empty list message if length is 0 (nothing in array)
         if(groceries.length == 0) {
             emptyList.setVisibility(View.VISIBLE);
-            list.setVisibility(View.INVISIBLE);
         }
         grocery_names = new String[groceries.length];
         for(int i = 0; i < groceries.length; i++) {
-                grocery_names[i] = groceries[i].getName();
+            grocery_names[i] = groceries[i].getName();
         }
 
         adapter = new productAdapterGrocery(getActivity(), grocery_names);
-        list.setAdapter(adapter);
+        listView.setAdapter(adapter);
 
-        // TODO: MAKE ONCLICK LISTENER FOR LISTVIEW TO HAVE DIALOG BOX POPUP TO EDIT TEXT OR EDIT TEXT IN LISTVIEW
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("Delete Item?");
-                builder.setPositiveButton("Delete", new MyDeleteButton(groceries[position].getId(), getActivity(), Fragment_GroceryList.this));
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builder.create().show();
+            public void create(SwipeMenu menu) {
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+                        getContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
+                // set item width
+                deleteItem.setWidth(200);
+                // set a icon
+                deleteItem.setIcon(R.drawable.ic_delete);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+
+        listView.setMenuCreator(creator);
+
+        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage("Delete Item?");
+                        builder.setPositiveButton("Delete", new MyDeleteButton(groceries[position].getId(), getActivity(), Fragment_GroceryList.this));
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        builder.create().show();
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
             }
         });
 
+        // TODO: MAKE ONCLICK LISTENER FOR LISTVIEW TO HAVE DIALOG BOX POPUP TO EDIT TEXT OR EDIT TEXT IN LISTVIEW
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // temporary toast
+                // add dialog to edit text
+                Toast.makeText(getActivity(), "CASE 0", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
     }
@@ -157,13 +198,14 @@ public class Fragment_GroceryList extends Fragment {
         }
         if (groceries.length == 0) {
             emptyList.setVisibility(View.VISIBLE);
-            list.setVisibility(View.INVISIBLE);
         }
         else {
             emptyList.setVisibility(View.INVISIBLE);
-            list.setVisibility(View.VISIBLE);
         }
-        adapter.changeGroceryItemsList(grocery_names);
+        // changeGroceryItemsList not deleting on index properly (but works when adding values)
+        // creating new adapter seems to fix this bug
+        adapter = new productAdapterGrocery(getActivity(), grocery_names);
+        listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 }
@@ -206,7 +248,6 @@ class productAdapterGrocery extends ArrayAdapter<String>
     }
 
 }
-
 
 class MyDeleteButton implements DialogInterface.OnClickListener {
 
