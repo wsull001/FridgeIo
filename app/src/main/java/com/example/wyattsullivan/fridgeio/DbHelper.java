@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by wyattsullivan on 1/29/18.
@@ -224,6 +225,24 @@ public class DbHelper extends SQLiteOpenHelper {
     public ArrayList<Product> getProductsByExpDate(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P  ORDER BY expDate",
+                null);
+        if (curs.getCount() == 0)
+            return null;
+        return turnCursIntoProducts(curs);
+    }
+
+    public ArrayList<Product> getProductsByAlphabetical(String fridgeID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P  ORDER BY name COLLATE NOCASE ASC",
+                null);
+        if (curs.getCount() == 0)
+            return null;
+        return turnCursIntoProducts(curs);
+    }
+
+    public ArrayList<Product> getProductsByExpiredOnly(String fridgeID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE expDate < date('now') ORDER BY expDate",
                 null);
         if (curs.getCount() == 0)
             return null;

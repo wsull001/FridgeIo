@@ -23,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -34,8 +33,11 @@ public class Fragment_ProductView extends Fragment {
     private Bitmap[] arr;
     private String fridgeID;
     View view;
+    productAdapter adapter;
     ArrayList<Product> prods;
     DbHelper dbHelp;
+    ListView list;
+    TextView emptyElement;
 
 
     public static Fragment_ProductView newInstance() {
@@ -81,17 +83,51 @@ public class Fragment_ProductView extends Fragment {
             // disable the first option in popupmenu ("Sort By:")
             popup.getMenu().getItem(0).setEnabled(false);
             // onClickItemListener for each sorting function call
-            // TODO: Create function for each sorting method and call it & refresh view for each menu item
+            // TODO: CREATE METHOD TO KEEP SORT METHOD AFTER ADDING NEW ITEM
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    Toast.makeText(getActivity(), "You clicked" + menuItem.getTitle(), Toast.LENGTH_SHORT).show();
+                    switch (menuItem.getItemId()) {
+                        case R.id.sort_by_date_added:
+                            dbHelp = new DbHelper(getActivity());
+                            prods = dbHelp.getProductsByDateAdded(fridgeID);
+                            loadAdapter();
+                            adapter.changeProductItemList(productNames, arr, productDescriptions);
+                            adapter.notifyDataSetChanged();
+                        break;
+
+                        case R.id.sort_by_expired_only:
+                            dbHelp = new DbHelper(getActivity());
+                            prods = dbHelp.getProductsByExpiredOnly(fridgeID);
+                            loadAdapter();
+                            adapter.changeProductItemList(productNames, arr, productDescriptions);
+                            adapter.notifyDataSetChanged();
+                        break;
+
+                        case R.id.sort_by_expiration_date:
+                            dbHelp = new DbHelper(getActivity());
+                            prods = dbHelp.getProductsByExpDate(fridgeID);
+                            loadAdapter();
+                            adapter.changeProductItemList(productNames, arr, productDescriptions);
+                            adapter.notifyDataSetChanged();
+                        break;
+
+                        case R.id.sort_by_name:
+                            dbHelp = new DbHelper(getActivity());
+                            prods = dbHelp.getProductsByAlphabetical(fridgeID);
+                            loadAdapter();
+                            adapter.changeProductItemList(productNames, arr, productDescriptions);
+                            adapter.notifyDataSetChanged();
+                        break;
+
+                        default:
+                            return true;
+                    }
                     return true;
                 }
             });
             popup.show();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -99,13 +135,33 @@ public class Fragment_ProductView extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_productview, container, false);
-        ListView list = (ListView) view.findViewById(R.id.listView);
-        TextView emptyElement = view.findViewById(R.id.emptyElementProduct);
+        list = (ListView) view.findViewById(R.id.listView);
+        emptyElement = view.findViewById(R.id.emptyElementProduct);
         fridgeID = getActivity().getIntent().getStringExtra("FridgeID");
 
         dbHelp = new DbHelper(getActivity());
         prods = dbHelp.getProductsByDateAdded(fridgeID);
 
+        loadAdapter();
+
+        adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
+        list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), ProductPage.class);
+                intent.putExtra("prodID", Fragment_ProductView.this.prods.get(position).getId());
+                startActivity(intent);
+            }
+        });
+
+        return view;
+    }
+
+    void loadAdapter()
+    {
         if(prods == null)
         {
             // must initialize empty string array
@@ -127,24 +183,8 @@ public class Fragment_ProductView extends Fragment {
                 productNames[i] = prods.get(i).getName();
                 productDescriptions[i] = prods.get(i).getDesc();
                 arr[i] = prods.get(i).getImage();
-
             }
         }
-
-        productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
-        list.setAdapter(adapter);
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ProductPage.class);
-                intent.putExtra("prodID", Fragment_ProductView.this.prods.get(position).getId());
-                startActivity(intent);
-            }
-        });
-
-        return view;
     }
 }
 
@@ -162,6 +202,15 @@ class productAdapter extends ArrayAdapter<String>
         this.titleArray = titles;
         this.descriptionArray = desc;
 
+    }
+
+    @Override public int getCount() { return titleArray.length; }
+
+    public void changeProductItemList(String[] tempTitles, Bitmap[] tempImgs, String[] tempDesc)
+    {
+        titleArray = tempTitles;
+        descriptionArray = tempDesc;
+        images = tempImgs;
     }
 
     @NonNull
@@ -186,4 +235,3 @@ class productAdapter extends ArrayAdapter<String>
         return row;
     }
 }
-

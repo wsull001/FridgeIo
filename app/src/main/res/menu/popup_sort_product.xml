@@ -18,5 +18,5 @@
 
     <item
         android:id="@+id/sort_by_name"
-        android:title="Name" />
+        android:title="Name (A-Z)" />
 </menu>
