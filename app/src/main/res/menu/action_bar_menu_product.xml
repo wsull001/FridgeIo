@@ -15,4 +15,11 @@
         app:showAsAction="always"
         />
 
+    <item
+        android:id="@+id/sort_button"
+        android:icon="@drawable/ic_sort_white_24dp"
+        android:title="sort"
+        app:showAsAction="always"
+        />
+
 </menu>

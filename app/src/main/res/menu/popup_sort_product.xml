@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sort_by_title"
+        android:title="Sort By:" />
+
+    <item
+        android:id="@+id/sort_by_date_added"
+        android:title="Date Added" />
+
+    <item
+        android:id="@+id/sort_by_expired_only"
+        android:title="Expired Only" />
+
+    <item
+        android:id="@+id/sort_by_expiration_date"
+        android:title="Expiration Date" />
+
+    <item
+        android:id="@+id/sort_by_name"
+        android:title="Name" />
+</menu>

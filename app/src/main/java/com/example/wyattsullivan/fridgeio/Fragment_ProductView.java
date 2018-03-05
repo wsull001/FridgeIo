@@ -21,7 +21,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -31,6 +33,7 @@ public class Fragment_ProductView extends Fragment {
     private String[] productDescriptions;
     private Bitmap[] arr;
     private String fridgeID;
+    View view;
     ArrayList<Product> prods;
     DbHelper dbHelp;
 
@@ -48,7 +51,7 @@ public class Fragment_ProductView extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.action_bar_menu_w_home, menu);
+        inflater.inflate(R.menu.action_bar_menu_product, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -61,22 +64,44 @@ public class Fragment_ProductView extends Fragment {
             intent.putExtra("FridgeID", getActivity().getIntent().getStringExtra("FridgeID"));
             startActivity(intent);
             return true;
-        } else if (id == R.id.home_button) {
+        }
+        else if (id == R.id.home_button) {
             Intent intent = new Intent(getActivity(), FragmentManagerFridge.class);
             startActivity(intent);
             return true;
         }
+
+        else if (id == R.id.sort_button) {
+            // create new view to get the menu activity
+            View menuView = getActivity().findViewById(R.id.sort_button);
+            // create instance of popupmenu
+            PopupMenu popup = new PopupMenu(getActivity(), menuView);
+            // inflate menu view into popup menu
+            popup.getMenuInflater().inflate(R.menu.popup_sort_product, popup.getMenu());
+            // disable the first option in popupmenu ("Sort By:")
+            popup.getMenu().getItem(0).setEnabled(false);
+            // onClickItemListener for each sorting function call
+            // TODO: Create function for each sorting method and call it & refresh view for each menu item
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    Toast.makeText(getActivity(), "You clicked" + menuItem.getTitle(), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+            popup.show();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_productview, container, false);
+        view = inflater.inflate(R.layout.fragment_productview, container, false);
         ListView list = (ListView) view.findViewById(R.id.listView);
         TextView emptyElement = view.findViewById(R.id.emptyElementProduct);
         fridgeID = getActivity().getIntent().getStringExtra("FridgeID");
-
 
         dbHelp = new DbHelper(getActivity());
         prods = dbHelp.getProductsByDateAdded(fridgeID);
