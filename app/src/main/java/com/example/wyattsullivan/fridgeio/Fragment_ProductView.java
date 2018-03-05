@@ -73,25 +73,38 @@ public class Fragment_ProductView extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_productview, container, false);
+        ListView list = (ListView) view.findViewById(R.id.listView);
+        TextView emptyElement = view.findViewById(R.id.emptyElementProduct);
         fridgeID = getActivity().getIntent().getStringExtra("FridgeID");
 
 
         dbHelp = new DbHelper(getActivity());
-
         prods = dbHelp.getProductsByDateAdded(fridgeID);
-        if (prods == null) return view;
-        productNames = new String[prods.size()];
-        productDescriptions = new String[prods.size()];
-        arr = new Bitmap[prods.size()];
 
-        for (int i = 0; i < prods.size(); i++) {
-            productNames[i] = prods.get(i).getName();
-            productDescriptions[i] = prods.get(i).getDesc();
-            arr[i] = prods.get(i).getImage();
-
+        if(prods == null)
+        {
+            // must initialize empty string array
+            productNames = new String[0];
+            productDescriptions = new String[0];
+            arr = new Bitmap[0];
+            emptyElement.setVisibility(View.VISIBLE);
+            list.setVisibility(View.INVISIBLE);
         }
+        else
+        {
+            productNames = new String[prods.size()];
+            productDescriptions = new String[prods.size()];
+            arr = new Bitmap[prods.size()];
+            emptyElement.setVisibility(View.INVISIBLE);
+            list.setVisibility(View.VISIBLE);
 
-        ListView list = (ListView) view.findViewById(R.id.listView);
+            for (int i = 0; i < prods.size(); i++) {
+                productNames[i] = prods.get(i).getName();
+                productDescriptions[i] = prods.get(i).getDesc();
+                arr[i] = prods.get(i).getImage();
+
+            }
+        }
 
         productAdapter adapter = new productAdapter(getActivity(), productNames, arr, productDescriptions);
         list.setAdapter(adapter);
