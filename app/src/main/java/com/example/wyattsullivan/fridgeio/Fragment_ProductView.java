@@ -25,6 +25,8 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Fragment_ProductView extends Fragment {
 
@@ -181,10 +183,19 @@ public class Fragment_ProductView extends Fragment {
 
             for (int i = 0; i < prods.size(); i++) {
                 productNames[i] = prods.get(i).getName();
-                productDescriptions[i] = prods.get(i).getDesc();
+                productDescriptions[i] = stringDate(prods.get(i).getExpDate());
                 arr[i] = prods.get(i).getImage();
             }
         }
+    }
+
+    String stringDate(Date tempDate)
+    {
+        Calendar exp = Calendar.getInstance();
+        exp.setTime(tempDate);
+        String expirationDate = "Expiration Date: " + (exp.get(Calendar.MONTH)+1) + "/"
+                + (exp.get(Calendar.DAY_OF_MONTH)) + "/" + (exp.get(Calendar.YEAR));
+        return  expirationDate;
     }
 }
 
