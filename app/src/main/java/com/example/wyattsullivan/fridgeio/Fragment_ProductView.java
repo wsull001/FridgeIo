@@ -89,7 +89,6 @@ public class Fragment_ProductView extends Fragment {
             // disable the first option in popupmenu ("Sort By:")
             popup.getMenu().getItem(0).setEnabled(false);
             // onClickItemListener for each sorting function call
-            // TODO: CREATE METHOD TO KEEP SORT METHOD AFTER ADDING NEW ITEM
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
