@@ -224,7 +224,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByExpDate(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P  ORDER BY expDate",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE FridgeID = '" + fridgeID + "' ORDER BY expDate",
                 null);
         if (curs.getCount() == 0)
             return null;
@@ -233,7 +233,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByAlphabetical(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P  ORDER BY name COLLATE NOCASE ASC",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE FridgeID = '" + fridgeID + "' ORDER BY name COLLATE NOCASE ASC",
                 null);
         if (curs.getCount() == 0)
             return null;
@@ -242,7 +242,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByExpiredOnly(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE expDate < date('now') ORDER BY expDate",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE FridgeID = '" + fridgeID + "' AND expDate < date('now') ORDER BY expDate",
                 null);
         if (curs.getCount() == 0)
             return null;
