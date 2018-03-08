@@ -30,6 +30,10 @@ import java.util.Date;
 
 public class Fragment_ProductView extends Fragment {
 
+    private static final String DATE_ADDED = "DA";
+    private static final String EXPIRE_ONLY = "EO";
+    private static final String EXPIRE_DATE = "ED";
+    private static final String NAME_AZ = "NA";
     private String[] productNames;
     private String[] productDescriptions;
     private Bitmap[] arr;
@@ -93,6 +97,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_date_added:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByDateAdded(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, DATE_ADDED);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -101,6 +106,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_expired_only:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByExpiredOnly(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, EXPIRE_ONLY);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -109,6 +115,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_expiration_date:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByExpDate(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, EXPIRE_DATE);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -117,6 +124,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_name:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByAlphabetical(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, NAME_AZ);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -142,7 +150,28 @@ public class Fragment_ProductView extends Fragment {
         fridgeID = getActivity().getIntent().getStringExtra("FridgeID");
 
         dbHelp = new DbHelper(getActivity());
-        prods = dbHelp.getProductsByDateAdded(fridgeID);
+
+        switch(dbHelp.getSortMethod(fridgeID)) {
+            case DATE_ADDED:
+                prods = dbHelp.getProductsByDateAdded(fridgeID);
+            break;
+
+            case EXPIRE_ONLY:
+                prods = dbHelp.getProductsByExpiredOnly(fridgeID);
+            break;
+
+            case EXPIRE_DATE:
+                prods = dbHelp.getProductsByExpDate(fridgeID);
+            break;
+
+            case NAME_AZ:
+                prods = dbHelp.getProductsByAlphabetical(fridgeID);
+            break;
+
+            default:
+                prods = dbHelp.getProductsByDateAdded(fridgeID);
+            break;
+        }
 
         loadAdapter();
 
