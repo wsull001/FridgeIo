@@ -63,7 +63,8 @@ public class DbHelper extends SQLiteOpenHelper {
                                                              "isChecked INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Fridge (fridgeID CHAR(30) PRIMARY KEY, " +
-                "fname TEXT)");
+                "fname TEXT," +
+                "sort TEXT)");
 
     }
 
@@ -86,6 +87,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         cv.put("fridgeID", key);
         cv.put("fname", name);
+        cv.put("sort", "DA");
 
         long result = db.insert("Fridge", null, cv);
 
@@ -224,7 +226,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByExpDate(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P  ORDER BY expDate",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE FridgeID = '" + fridgeID + "' ORDER BY expDate",
                 null);
         if (curs.getCount() == 0)
             return null;
@@ -233,7 +235,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByAlphabetical(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P  ORDER BY name COLLATE NOCASE ASC",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE FridgeID = '" + fridgeID + "' ORDER BY name COLLATE NOCASE ASC",
                 null);
         if (curs.getCount() == 0)
             return null;
@@ -242,7 +244,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProductsByExpiredOnly(String fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE expDate < date('now') ORDER BY expDate",
+        Cursor curs = db.rawQuery("SELECT " + productItems + " FROM ProductList P WHERE FridgeID = '" + fridgeID + "' AND expDate < date('now') ORDER BY expDate",
                 null);
         if (curs.getCount() == 0)
             return null;
@@ -263,6 +265,21 @@ public class DbHelper extends SQLiteOpenHelper {
             curs.moveToNext();
         }
         return ret;
+    }
+
+    public String getSortMethod(String fridgeID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor curs = db.rawQuery("SELECT sort FROM Fridge WHERE FridgeID='" + fridgeID + "'", null);
+        curs.moveToFirst();
+        return curs.getString(0);
+    }
+
+    public boolean editSortMethod(String fridgeID, String sort) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues newValue = new ContentValues();
+        newValue.put("sort", sort);
+        long result = db.update("Fridge", newValue, "fridgeID='"+fridgeID+"'", null);
+        return (result != -1);
     }
 
     public void addGroceryItem(String name) {

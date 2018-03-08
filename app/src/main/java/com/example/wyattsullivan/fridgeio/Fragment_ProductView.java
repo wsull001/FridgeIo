@@ -25,9 +25,15 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Fragment_ProductView extends Fragment {
 
+    private static final String DATE_ADDED = "DA";
+    private static final String EXPIRE_ONLY = "EO";
+    private static final String EXPIRE_DATE = "ED";
+    private static final String NAME_AZ = "NA";
     private String[] productNames;
     private String[] productDescriptions;
     private Bitmap[] arr;
@@ -83,7 +89,6 @@ public class Fragment_ProductView extends Fragment {
             // disable the first option in popupmenu ("Sort By:")
             popup.getMenu().getItem(0).setEnabled(false);
             // onClickItemListener for each sorting function call
-            // TODO: CREATE METHOD TO KEEP SORT METHOD AFTER ADDING NEW ITEM
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
@@ -91,6 +96,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_date_added:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByDateAdded(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, DATE_ADDED);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -99,6 +105,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_expired_only:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByExpiredOnly(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, EXPIRE_ONLY);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -107,6 +114,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_expiration_date:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByExpDate(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, EXPIRE_DATE);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -115,6 +123,7 @@ public class Fragment_ProductView extends Fragment {
                         case R.id.sort_by_name:
                             dbHelp = new DbHelper(getActivity());
                             prods = dbHelp.getProductsByAlphabetical(fridgeID);
+                            dbHelp.editSortMethod(fridgeID, NAME_AZ);
                             loadAdapter();
                             adapter.changeProductItemList(productNames, arr, productDescriptions);
                             adapter.notifyDataSetChanged();
@@ -140,7 +149,28 @@ public class Fragment_ProductView extends Fragment {
         fridgeID = getActivity().getIntent().getStringExtra("FridgeID");
 
         dbHelp = new DbHelper(getActivity());
-        prods = dbHelp.getProductsByDateAdded(fridgeID);
+
+        switch(dbHelp.getSortMethod(fridgeID)) {
+            case DATE_ADDED:
+                prods = dbHelp.getProductsByDateAdded(fridgeID);
+            break;
+
+            case EXPIRE_ONLY:
+                prods = dbHelp.getProductsByExpiredOnly(fridgeID);
+            break;
+
+            case EXPIRE_DATE:
+                prods = dbHelp.getProductsByExpDate(fridgeID);
+            break;
+
+            case NAME_AZ:
+                prods = dbHelp.getProductsByAlphabetical(fridgeID);
+            break;
+
+            default:
+                prods = dbHelp.getProductsByDateAdded(fridgeID);
+            break;
+        }
 
         loadAdapter();
 
@@ -181,10 +211,19 @@ public class Fragment_ProductView extends Fragment {
 
             for (int i = 0; i < prods.size(); i++) {
                 productNames[i] = prods.get(i).getName();
-                productDescriptions[i] = prods.get(i).getDesc();
+                productDescriptions[i] = stringDate(prods.get(i).getExpDate());
                 arr[i] = prods.get(i).getImage();
             }
         }
+    }
+
+    String stringDate(Date tempDate)
+    {
+        Calendar exp = Calendar.getInstance();
+        exp.setTime(tempDate);
+        String expirationDate = "Expiration Date: " + (exp.get(Calendar.MONTH)+1) + "/"
+                + (exp.get(Calendar.DAY_OF_MONTH)) + "/" + (exp.get(Calendar.YEAR));
+        return  expirationDate;
     }
 }
 
