@@ -60,7 +60,7 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS GroceryList (grocID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                             "name TEXT, " +
                                                             "quantity INTEGER, " +
-                                                            "isChecked INTEGER)");
+                                                             "isChecked INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Fridge (fridgeID CHAR(30) PRIMARY KEY, " +
                 "fname TEXT)");

@@ -34,7 +34,6 @@ import static android.Manifest.permission.*;
 
 public class Add_product extends AppCompatActivity {
     //Widget Variables
-    //TODO: Add support for image
 
     DatePickerDialog.OnDateSetListener expDatePicker;
     Button submitButton;
@@ -55,6 +54,19 @@ public class Add_product extends AppCompatActivity {
     int expMonth;
     int expDay;
     String fridgeID;
+
+    public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
+                                   boolean filter) {
+        float ratio = Math.min(
+                (float) maxImageSize / realImage.getWidth(),
+                (float) maxImageSize / realImage.getHeight());
+        int width = Math.round((float) ratio * realImage.getWidth());
+        int height = Math.round((float) ratio * realImage.getHeight());
+
+        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
+                height, filter);
+        return newBitmap;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,6 +303,7 @@ public class Add_product extends AppCompatActivity {
 
         } else if (requestCode == CAMERA) {
             Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+            thumbnail = scaleDown(thumbnail, 100, false);
             imageview.setImageBitmap(thumbnail);
             bitmap = thumbnail;
         }
