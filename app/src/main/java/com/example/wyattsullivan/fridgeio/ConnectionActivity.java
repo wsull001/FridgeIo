@@ -75,6 +75,26 @@ public class ConnectionActivity extends AppCompatActivity {
     }
 }
 
+class PercentageRun implements Runnable {
+
+    int base;
+    int high;
+    ConnectionActivity activity;
+
+    PercentageRun(int at, int tot, ConnectionActivity act) {
+        base = at;
+        high = tot;
+        activity = act;
+
+    }
+
+
+    @Override
+    public void run() {
+        activity.setStatusText("Sending the fridge (" + ((base * 100) / high) + "%)");
+    }
+}
+
 class PushFridgeThread implements Runnable {
 
 
@@ -112,7 +132,7 @@ class PushFridgeThread implements Runnable {
             parent.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    parent.setStatusText("Sending the fridge");
+                    parent.setStatusText("Sending the fridge (0%)");
                 }
             });
 
@@ -141,6 +161,9 @@ class PushFridgeThread implements Runnable {
 
 
                 for (int i = 0; i < products.size(); i++) {
+
+                    parent.runOnUiThread(new PercentageRun(i, products.size(), parent));
+
                     Product tp = products.get(i);
                     os.write(tp.getId().getBytes());
                     os.writeInt(tp.getName().length());
@@ -164,11 +187,11 @@ class PushFridgeThread implements Runnable {
                         int imgSize = tmpImage.length;
                         os.writeInt(imgSize);
                         int off = 0;
-                        int numPacs = imgSize / 100 + 1;
+                        int numPacs = imgSize / 900 + 1;
                         int curSeq = 0;
                         while (curSeq < numPacs) {
-                            int to_send = Math.min(100, imgSize - 100 * curSeq);
-                            os.write(tmpImage, 100 * curSeq, to_send);
+                            int to_send = Math.min(900, imgSize - 900 * curSeq);
+                            os.write(tmpImage, 900 * curSeq, to_send);
                             int resp = in.readInt();
                             if (resp > curSeq) curSeq = resp;
                         }
@@ -186,6 +209,26 @@ class PushFridgeThread implements Runnable {
                             }
                         });
                     }
+                }
+
+                os.write("end".getBytes());
+
+                in.readFully(acks);
+
+                if (new String(acks).equals("ack")) {
+                    parent.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            parent.setStatusText("Fridge sent successfully");
+                        }
+                    });
+                } else {
+                    parent.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            parent.setStatusText("Error: failed to send all the products");
+                        }
+                    });
                 }
 
 
