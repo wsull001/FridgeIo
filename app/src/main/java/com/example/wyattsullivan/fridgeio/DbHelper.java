@@ -66,7 +66,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 "fname TEXT," +
                 "sort TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS Notifications (notifID CHAR(30) PRIMARY KEY AUTOINCREMENT, " +
+        db.execSQL("CREATE TABLE IF NOT EXISTS Notifications (notifID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                                 "FridgeID CHAR(30), " +
                                                                 "enabled INTEGER, " +
                                                                 "hour INTEGER, " +
