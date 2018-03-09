@@ -335,7 +335,7 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor curs = db.rawQuery("SELECT * FROM Notifications WHERE fridgeID='"+fid+"'", null);
         curs.moveToFirst();
-        Notification n = new Notification(fid, curs.getInt(2), curs.getInt(3), curs.getInt(4), curs.getInt(5));
+        Notification n = new Notification(fid, curs.getInt(0),curs.getInt(2), curs.getInt(3), curs.getInt(4), curs.getInt(5));
         return n;
     }
 

@@ -5,19 +5,23 @@ package com.example.wyattsullivan.fridgeio;
  */
 
 public class Notification {
+    private int notifID;
     private String fridgeID;
     private int enabled;
     private int hour;
     private int minute;
     private int frequency;
 
-    public Notification(String fid, int en, int h, int m, int f) {
+    public Notification(String fid, int nid, int en, int h, int m, int f) {
+        notifID = nid;
         fridgeID = fid;
         enabled = en;
         hour = h;
         minute = m;
         frequency = f;
     }
+
+    public int getNotifID() { return notifID; }
 
     public int getEnabled() {
         return enabled;
