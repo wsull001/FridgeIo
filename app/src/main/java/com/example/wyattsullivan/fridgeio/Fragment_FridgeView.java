@@ -4,7 +4,9 @@ package com.example.wyattsullivan.fridgeio;
  * Created by samhwang on 2/16/18.
  */
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Calendar;
 
 public class Fragment_FridgeView extends Fragment {
 
@@ -90,6 +93,23 @@ public class Fragment_FridgeView extends Fragment {
                         keys = fridgeList.getIds();
                         setNotification();
                     }
+                    //Added Notification Support for New Fridges
+                    Intent notificationIntent = new Intent(getContext(), NotificationPublisher.class);
+                    String fridgeID = fridgeList.getIds()[fridgeList.getSize()-1];
+                    notificationIntent.putExtra("FridgeID", fridgeID);
+                    Notification notif = dbHelp.getNotification(fridgeID);
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.HOUR_OF_DAY, notif.getHour());
+                    cal.set(Calendar.MINUTE, notif.getMinute());
+                    cal.set(Calendar.SECOND, 0);
+                    long delay = cal.getTimeInMillis();
+
+                    PendingIntent PendIn = PendingIntent.getBroadcast(getContext(), notif.getNotifID(),
+                            notificationIntent, 0);
+                    AlarmManager almMn = (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
+                    almMn.set(AlarmManager.RTC_WAKEUP, delay, PendIn);
+
                     adapter.changeFridgeList(fridge_names);
                     adapter.notifyDataSetChanged();
                 }

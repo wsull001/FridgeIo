@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.wyattsullivan.fridgeio">
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -27,8 +27,25 @@
         <activity android:name=".Add_product" />
         <activity android:name=".ProductPage" />
         <activity android:name=".FragmentManagerProduct" />
-        <activity android:name=".AddFridge" />
-        <activity android:name=".ConnectionActivity"></activity>
+        <activity android:name=".AddFridge"></activity>
+
+        <receiver
+            android:name=".NotificationPublisher"
+            android:enabled="true">
+        </receiver>
+        <service
+            android:name=".StartupService"
+            android:enabled="true">
+        </service>
+        <receiver
+            android:name=".StartupBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
