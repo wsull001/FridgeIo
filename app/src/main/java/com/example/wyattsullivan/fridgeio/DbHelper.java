@@ -66,6 +66,12 @@ public class DbHelper extends SQLiteOpenHelper {
                 "fname TEXT," +
                 "sort TEXT)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS Notifications (notifID CHAR(30) PRIMARY KEY AUTOINCREMENT, " +
+                                                                "FridgeID CHAR(30), " +
+                                                                "enabled INTEGER, " +
+                                                                "hour INTEGER, " +
+                                                                "minute INTEGER, " +
+                                                                "frequency INTEGER)");
     }
 
 
@@ -282,16 +288,62 @@ public class DbHelper extends SQLiteOpenHelper {
         return (result != -1);
     }
 
-    public void addGroceryItem(String name) {
-
+    // initialize settings when creating new fridge
+    public void createNotification(String fid) {
         ContentValues cv = new ContentValues();
-
-        cv.put("name", name);
-
         SQLiteDatabase db = getWritableDatabase();
 
-        db.insert("GroceryList", null, cv);
+        cv.put("FridgeID", fid);
+        cv.put("enabled", 1);
+        cv.put("hour", 12);
+        cv.put("minute", 0);
+        cv.put("frequency", 2);
 
+        db.insert("Notifications", null, cv);
+    }
+
+    public void editNotificationEnabled(String fid, int en) {
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = getWritableDatabase();
+        cv.put("enabled", en);
+        db.update("Notifications", cv, "FridgeID='"+fid+"'", null);
+    }
+
+    public void editNotificationHour(String fid, int h) {
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = getWritableDatabase();
+        cv.put("hour", h);
+        db.update("Notifications", cv, "FridgeID='"+fid+"'", null);
+    }
+
+    public void editNotificationMinute(String fid, int m) {
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = getWritableDatabase();
+        cv.put("minute", m);
+        db.update("Notifications", cv, "FridgeID='"+fid+"'", null);
+    }
+
+    public void editNotificationFrequency(String fid, int f) {
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = getWritableDatabase();
+        cv.put("frequency", f);
+        db.update("Notifications", cv, "FridgeID='"+fid+"'", null);
+    }
+
+    // call desired notification by fridgeID
+    public Notification getNotification(String fid) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM Notifications WHERE fridgeID='"+fid+"'", null);
+        curs.moveToFirst();
+        Notification n = new Notification(fid, curs.getInt(2), curs.getInt(3), curs.getInt(4), curs.getInt(5));
+        return n;
+    }
+
+    public void addGroceryItem(String name) {
+        ContentValues cv = new ContentValues();
+        cv.put("name", name);
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert("GroceryList", null, cv);
     }
 
     public boolean editGroceryItem(String newName, int id) {

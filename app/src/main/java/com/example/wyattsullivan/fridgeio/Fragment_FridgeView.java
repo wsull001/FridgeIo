@@ -86,6 +86,7 @@ public class Fragment_FridgeView extends Fragment {
                         list.setVisibility(View.VISIBLE);
                         fridge_names = fridgeList.getNames();
                         keys = fridgeList.getIds();
+                        setNotification();
                     }
                     adapter.changeFridgeList(fridge_names);
                     adapter.notifyDataSetChanged();
@@ -143,6 +144,13 @@ public class Fragment_FridgeView extends Fragment {
 
         return view;
         // TODO: Add functionality to delete fridge (swipe right to delet)
+    }
+
+    //set default notifications for new fridge
+    // assuming new fridge is created at the BACK of the fridge list
+    void setNotification() {
+        int fsize = fridgeList.getSize();
+        dbHelp.createNotification(keys[fsize-1]);
     }
 }
 
