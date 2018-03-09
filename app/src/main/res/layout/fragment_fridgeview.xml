@@ -22,4 +22,13 @@
         android:layout_centerInParent="true"
         android:textColor="@android:color/darker_gray"/>
 
+    <!-- Temp Button pls delete when done -->
+    <ImageButton
+        android:id="@+id/fakeButtonFridgeView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        app:srcCompat="@drawable/ic_android_24dp"/>
+
 </RelativeLayout>
