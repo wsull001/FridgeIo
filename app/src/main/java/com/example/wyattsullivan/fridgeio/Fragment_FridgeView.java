@@ -164,16 +164,7 @@ public class Fragment_FridgeView extends Fragment {
         adapter = new fridgeAdapter(getActivity(), fridge_names);
         list.setAdapter(adapter);
 
-        ///////// TODO: temp button pls delete when done
-        ImageButton button = (ImageButton) view.findViewById(R.id.fakeButtonFridgeView);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Dialog_Bluetooth b = new Dialog_Bluetooth();
-                b.showDialog(getActivity(), fridgeList);
-            }
-        });
-        ///////// TODO: temp button pls delete when done
+
 
         return view;
         // TODO: Add functionality to delete fridge (swipe right to delet)

@@ -19,14 +19,14 @@ public class Dialog_Bluetooth {
 
     public Dialog_Bluetooth() {}
 
-    public void showDialog(final Context ctxt, FridgeList fridgeList) {
+    public void showDialog(final Context ctxt, FridgeList fridgeList, String title) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ctxt);
 
         LayoutInflater inflater = (LayoutInflater) ctxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View mView = inflater.inflate(R.layout.dialog_bluetooth_listview, null);
 
         TextView bluetooth_title = (TextView) mView.findViewById(R.id.new_title_bluetooth);
-        bluetooth_title.setText("Bluetooth Title Here");
+        bluetooth_title.setText(title);
 
         final ListView bluetooth_list = (ListView) mView.findViewById(R.id.listViewBluetoothDialog);
 

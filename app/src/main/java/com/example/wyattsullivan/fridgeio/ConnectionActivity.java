@@ -1,13 +1,19 @@
 package com.example.wyattsullivan.fridgeio;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,13 +25,69 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
+
+class FridgeChoiceListener implements AdapterView.OnItemClickListener {
+
+    FridgeList l;
+    AlertDialog myDialog;
+    int option;
+    ConnectionActivity theAct;
+    DbHelper db;
+
+    FridgeChoiceListener(FridgeList ll, AlertDialog mD, int opt, ConnectionActivity tA, DbHelper data) {
+        l = ll;
+        myDialog = mD;
+        option = opt;
+        theAct = tA;
+        db = data;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (option == 0) { //push this fridge
+            theAct.isRunningConnection = true;
+            new Thread(new PushFridgeThread(theAct, l.getIds()[position], l.getNames()[position], theAct.device,db.getProductsByDateAdded(l.getIds()[position]))).start();
+            myDialog.dismiss();
+        }
+    }
+}
+
 public class ConnectionActivity extends AppCompatActivity {
 
 
-    boolean isRunningConnection;
+    public boolean isRunningConnection;
     Button pushFridge;
+    public BluetoothDevice device;
 
-    BluetoothDevice device;
+
+    public void showDialog(final Context ctxt, FridgeList fridgeList, String title, int opt, DbHelper db) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctxt);
+
+        LayoutInflater inflater = (LayoutInflater) ctxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View mView = inflater.inflate(R.layout.dialog_bluetooth_listview, null);
+
+        TextView bluetooth_title = (TextView) mView.findViewById(R.id.new_title_bluetooth);
+        bluetooth_title.setText(title);
+
+        final ListView bluetooth_list = (ListView) mView.findViewById(R.id.listViewBluetoothDialog);
+
+        fridgeAdapter adapter = new fridgeAdapter(ctxt, fridgeList.getNames());
+        bluetooth_list.setAdapter(adapter);
+
+        builder.setView(mView);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int id) {
+                dialogInterface.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+
+        bluetooth_list.setOnItemClickListener(new FridgeChoiceListener(fridgeList,dialog,0,this, db));
+
+        dialog.show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +103,10 @@ public class ConnectionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!isRunningConnection) {
-                    isRunningConnection = true;
                     DbHelper dbHelp = new DbHelper(ConnectionActivity.this);
                     FridgeList fl = dbHelp.getFridges();
                     ArrayList<Product> ps = dbHelp.getProductsByAlphabetical(fl.getIds()[0]);
-                    new Thread(new PushFridgeThread(ConnectionActivity.this, fl.getIds()[0], fl.getNames()[0], device, ps)).start();
+                    showDialog(ConnectionActivity.this, fl, "tmp", 0, dbHelp); // 0: push fridge
                 } else {
                     Toast.makeText(ConnectionActivity.this, "Wait for the current task to finish", Toast.LENGTH_SHORT).show();
                 }
@@ -153,62 +214,66 @@ class PushFridgeThread implements Runnable {
             if ((new String(acks)).equals("ack")) {
 
                 //send number of products
-                os.writeInt(products.size());
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                if (products != null) {
+                    os.writeInt(products.size());
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-                //to know whether to send end or not
-                boolean successful = true;
+                    //to know whether to send end or not
+                    boolean successful = true;
 
 
-                for (int i = 0; i < products.size(); i++) {
+                    for (int i = 0; i < products.size(); i++) {
 
-                    parent.runOnUiThread(new PercentageRun(i, products.size(), parent));
+                        parent.runOnUiThread(new PercentageRun(i, products.size(), parent));
 
-                    Product tp = products.get(i);
-                    os.write(tp.getId().getBytes());
-                    os.writeInt(tp.getName().length());
-                    os.write(tp.getName().getBytes());
-                    os.write(tp.getFridgeID().getBytes());
-                    if (tp.getDesc() != null) {
-                        os.writeInt(tp.getDesc().length());
-                        os.write(tp.getDesc().getBytes());
-                    } else {
-                        os.writeInt(-1);
-                    }
-                    os.writeInt(tp.getCapacity());
-                    String tmpDate = df.format(tp.getExpDate());
-                    os.writeInt(tmpDate.length());
-                    os.write(tmpDate.getBytes());
-                    tmpDate = df.format(tp.getDateAdded());
-                    os.writeInt(tmpDate.length());
-                    os.write(tmpDate.getBytes());
-                    if (tp.getImage() != null) {
-                        byte[] tmpImage = DbHelper.bitmapToBytes(tp.getImage());
-                        int imgSize = tmpImage.length;
-                        os.writeInt(imgSize);
-                        int off = 0;
-                        int numPacs = imgSize / 900 + 1;
-                        int curSeq = 0;
-                        while (curSeq < numPacs) {
-                            int to_send = Math.min(900, imgSize - 900 * curSeq);
-                            os.write(tmpImage, 900 * curSeq, to_send);
-                            int resp = in.readInt();
-                            if (resp > curSeq) curSeq = resp;
+                        Product tp = products.get(i);
+                        os.write(tp.getId().getBytes());
+                        os.writeInt(tp.getName().length());
+                        os.write(tp.getName().getBytes());
+                        os.write(tp.getFridgeID().getBytes());
+                        if (tp.getDesc() != null) {
+                            os.writeInt(tp.getDesc().length());
+                            os.write(tp.getDesc().getBytes());
+                        } else {
+                            os.writeInt(-1);
                         }
-                    } else {
-                        os.writeInt(-1);
-                    }
-                    os.writeInt((tp.isCapacity() ? 1 : 0));
-                    os.write("check".getBytes());
-                    in.readFully(acks);
-                    if (!(new String(acks)).equals("ack")) {
-                        parent.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                parent.setStatusText("Error: failed to send all the products");
+                        os.writeInt(tp.getCapacity());
+                        String tmpDate = df.format(tp.getExpDate());
+                        os.writeInt(tmpDate.length());
+                        os.write(tmpDate.getBytes());
+                        tmpDate = df.format(tp.getDateAdded());
+                        os.writeInt(tmpDate.length());
+                        os.write(tmpDate.getBytes());
+                        if (tp.getImage() != null) {
+                            byte[] tmpImage = DbHelper.bitmapToBytes(tp.getImage());
+                            int imgSize = tmpImage.length;
+                            os.writeInt(imgSize);
+                            int off = 0;
+                            int numPacs = imgSize / 900 + 1;
+                            int curSeq = 0;
+                            while (curSeq < numPacs) {
+                                int to_send = Math.min(900, imgSize - 900 * curSeq);
+                                os.write(tmpImage, 900 * curSeq, to_send);
+                                int resp = in.readInt();
+                                if (resp > curSeq) curSeq = resp;
                             }
-                        });
+                        } else {
+                            os.writeInt(-1);
+                        }
+                        os.writeInt((tp.isCapacity() ? 1 : 0));
+                        os.write("check".getBytes());
+                        in.readFully(acks);
+                        if (!(new String(acks)).equals("ack")) {
+                            parent.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    parent.setStatusText("Error: failed to send all the products");
+                                }
+                            });
+                        }
                     }
+                } else {
+                    os.writeInt(0);
                 }
 
                 os.write("end".getBytes());
