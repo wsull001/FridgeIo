@@ -90,10 +90,9 @@ public class ProductPage extends AppCompatActivity {
 
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
             public void onStopTrackingTouch(SeekBar seekBar){
-                // TODO My code goes here
 
                 int level = seekBar.getProgress();
-                dbHelper.updateProductFullness(prodID, level);
+                dbHelper.updateProductFullness(prodID, level, theProduct.getFridgeID());
             }
 
             public void onStartTrackingTouch(SeekBar seekBar){}
@@ -137,7 +136,7 @@ class deleteAndAddToGroceryList implements DialogInterface.OnClickListener {
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
         DbHelper dbHelper = new DbHelper(context);
-        dbHelper.deleteProduct(prod_id);
+        dbHelper.deleteProduct(prod_id, fridgeID);
         dbHelper.addGroceryItem(groceryItem);
         Intent intent = new Intent(context, FragmentManagerProduct.class);
         intent.putExtra("FridgeID", fridgeID);
@@ -159,7 +158,7 @@ class deleteProductButton implements DialogInterface.OnClickListener {
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
         DbHelper dbHelper = new DbHelper(context);
-        dbHelper.deleteProduct(prod_id);
+        dbHelper.deleteProduct(prod_id, fridgeID);
         Intent intent = new Intent(context, FragmentManagerProduct.class);
         intent.putExtra("FridgeID", fridgeID);
         context.startActivity(intent);

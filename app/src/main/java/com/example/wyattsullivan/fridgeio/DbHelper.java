@@ -104,6 +104,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
+
     public boolean insertProductFromSync(Product prod, byte[] image) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -147,6 +148,49 @@ public class DbHelper extends SQLiteOpenHelper {
         return (result != -1);
     }
 
+    public boolean resolveUpdate(int updID) {
+        SQLiteDatabase db = getWritableDatabase();
+        long result = db.delete("ToUpdate", "updateID = " + updID, null);
+
+        return (result != -1);
+    }
+
+    public boolean createUpdate(String pID, int type) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        Cursor curs = db.rawQuery("SELECT type, updateID FROM ToUpdate WHERE prodID = '" + pID + "'", null);
+        if (curs.getCount() > 0) { //already exists
+            curs.moveToNext();
+            int curType = curs.getInt(0);
+            int curID = curs.getInt(1);
+            if (curType == 1) { //currently new, don't do anything
+                if (type == 2) { //remove the update from the table, it's no longer needed
+                    long result = db.delete("ToUpdate", "updateID = " + curID, null);
+                    return (result != -1);
+                }
+                //otherwise nothing is needed to be done
+                return true;
+            } else if (curType == 3) {
+                if (type == 2) { //change from update to delete record
+                    ContentValues cv = new ContentValues();
+                    cv.put("type", type);
+                    long result = db.update("ToUpdate", cv, "updateID = " + curID, null);
+                    return (result != -1);
+                }
+                return true; //can't add a product that already exists, if it's updating again it's already marked as updated
+            }
+            return true; //it shouldn't really reach here, just in case something goes wrong
+        }
+
+        //otherwise the product isn't in the update table, put it in there
+        ContentValues cv = new ContentValues();
+        cv.put("type", type);
+        cv.put("prodID", pID);
+        long result = db.insert("ToUpdate", null, cv);
+
+        return (result != -1);
+    }
+
 
     //Insert product, picture, and add to update table
     public boolean insertProduct(Product prod, Bitmap bmap) {
@@ -175,11 +219,10 @@ public class DbHelper extends SQLiteOpenHelper {
             return false;
         }
 
-        cv = new ContentValues();
-        cv.put("type", 1); //mark as new entry
-        cv.put("prodID", key);
 
-        result = db.insert("ToUpdate", null, cv);
+        if (isHosted(prod.getFridgeID())) {
+            createUpdate(key, 1); //create a new item update
+        }
 
         if (result == -1)
             return false;
@@ -188,34 +231,35 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean deleteProduct(String id) {
-        //TODO: implement delete: DELETE PHOTO
+    public boolean deleteProduct(String id, String fid) {
         SQLiteDatabase db = this.getWritableDatabase();
         int res = db.delete("ProductList", "prodID = '" + id + "'", null);
-        if (res > 0) {
-            //update records in update table
-            Cursor curs = db.rawQuery("SELECT * FROM ToUpdate WHERE prodID = '" + id + "'", null);
-            if (curs.getCount() > 0) {
-                //record already in update table, update it
-                ContentValues cv = new ContentValues();
-                cv.put("type", 2); //mark as delete
-                res = db.update("ToUpdate",cv, "prodID = '" + id + "'", null);
 
-            } else {
-                ContentValues cv = new ContentValues();
-                cv.put("type", 2); //delete
-                cv.put("prodID", id);
-                long res2 = db.insert("ToUpdate", null, cv);
-            }
+        if (isHosted(fid)) {
+            createUpdate(id, 2); //delete
         }
 
-        return false;
+        return (res > 0);
     }
 
 
-    public boolean updateProductFullness(String id, int cap) {
-        //TODO: implement update fullness
-        return false;
+    public boolean updateProductFullness(String id, int cap, String fid) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+
+        cv.put("fullness", cap);
+
+        long result = db.update("ProductList", cv, "prodID = '" + id + "'", null);
+
+        if (isHosted(fid)) {
+            createUpdate(id, 3); //capacity update
+        }
+
+
+
+        return (result != -1);
     }
 
     private ArrayList<Product> turnCursIntoProducts(Cursor cursor) {
@@ -250,10 +294,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean updateCapacity(int capacity, String prodID) {
-        //TODO: Finish capacity update
-        return false;
-    }
+
 
 
     public Product getProductById(String id) {
