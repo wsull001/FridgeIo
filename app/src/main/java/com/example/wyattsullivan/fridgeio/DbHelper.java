@@ -64,7 +64,8 @@ public class DbHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Fridge (fridgeID CHAR(30) PRIMARY KEY, " +
                 "fname TEXT," +
-                "sort TEXT)");
+                "sort TEXT," +
+                "isHosted INTEGER DEFAULT 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS Notifications (notifID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                                 "FridgeID CHAR(30), " +
@@ -86,6 +87,8 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
+
+
     public boolean createFridge(String name) {
         String key = genRand30Char();
         ContentValues cv = new ContentValues();
@@ -100,6 +103,49 @@ public class DbHelper extends SQLiteOpenHelper {
         return (result != -1);
     }
 
+
+    public boolean insertProductFromSync(Product prod, byte[] image) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        String key = prod.getId();
+
+        //if there is an image set it up
+        if (image != null) {
+            cv.put("image", image);
+        } else {
+            cv.putNull("image");
+        }
+        cv.put("isCapacity", (prod.isCapacity() ? 1 : 0));
+        cv.put("prodID", key);
+        cv.put("name", prod.getName());
+        cv.put("FridgeID", prod.getFridgeID());
+        cv.put("description", prod.getDesc());
+        cv.put("fullness", prod.getCapacity());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        cv.put("expDate", df.format(prod.getExpDate()));
+        cv.put("dateAdded", df.format(prod.getDateAdded()));
+        long result = db.insert("ProductList",null, cv);
+        if (result == -1) {
+            return false;
+        }
+        return true;
+
+    }
+
+
+    public boolean createFridgeFromSync(String name, String id) {
+        String key = id;
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        cv.put("fridgeID", key);
+        cv.put("fname", name);
+        cv.put("sort", "DA");
+
+        long result = db.insert("Fridge", null, cv);
+
+        return (result != -1);
+    }
 
 
     //Insert product, picture, and add to update table
@@ -377,6 +423,31 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
+    public boolean isHosted(String fID) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT isHosted FROM Fridge WHERE fridgeID = '" + fID + "'", null);
+        if (curs.getCount() <= 0)
+            return true; //shouldn't happen, but if it does do this
+        curs.moveToNext();
+        return (curs.getInt(0) == 1);
+    }
+
+    public void setIsHosted(String fID, boolean isHosted) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("isHosted", (isHosted ? 1 : 0));
+        db.update("Fridge", cv, "fridgeID = '" + fID + "'", null);
+    }
+
+    public boolean hasFridge(String fID) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        Cursor curs = db.rawQuery("SELECT * FROM Fridge WHERE fridgeID = '" + fID + "'", null);
+
+        return (curs.getCount() > 0);
 
     }
 }
