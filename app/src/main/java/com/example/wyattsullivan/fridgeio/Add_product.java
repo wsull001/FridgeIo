@@ -291,6 +291,7 @@ public class Add_product extends AppCompatActivity {
                 Uri contentURI = data.getData();
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+                    bitmap = scaleDown(bitmap, 100, false);
                     this.bitmap = bitmap;
                     Toast.makeText(Add_product.this, "Image Saved!", Toast.LENGTH_SHORT).show();
                     imageview.setImageBitmap(bitmap);

@@ -40,6 +40,25 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
     }
 
+    public boolean syncUpdateFullness(String pId, int cap) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+
+        cv.put("fullness", cap);
+
+        long result = db.update("ProductList", cv, "prodID = '" + pId + "'", null);
+
+        return (result != -1);
+    }
+
+    public boolean syncDeleteItem(String pId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int res = db.delete("ProductList", "prodID = '" + pId + "'", null);
+
+        return (res != -1);
+    }
+
     ArrayList<UpdateTriplet> getFridgeUpdates(String fid) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor curs = db.rawQuery("SELECT U.type, U.updateID, U.prodID FROM ToUpdate U WHERE U.fridgeID = '" + fid + "'", null);

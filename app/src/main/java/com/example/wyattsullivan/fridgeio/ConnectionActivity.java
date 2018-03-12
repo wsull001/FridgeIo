@@ -918,9 +918,8 @@ class SyncFridgesThread implements Runnable {
                 int curSeq = 0;
 
                 dOut.writeInt(msgLen);
-                Log.d("Bluetooth", "Msg Length: " + msgLen);
                 while (curSeq < numPacks) {
-                    parent.runOnUiThread(new PercentageRun(curSeq, numPacks, parent, "Sending updates to fridge " + (i+1) + "/" + fridges.size()));
+                    parent.runOnUiThread(new PercentageRun(curSeq, numPacks, parent, "Getting updates from fridge " + (i+1) + "/" + fridges.size()));
                     int off = curSeq * 800;
                     int len = Math.min(msgLen - off, 800);
                     dOut.write(theMsg, off, len);
@@ -938,9 +937,95 @@ class SyncFridgesThread implements Runnable {
                     Log.d("Bluetooth", "Sent successfully");
                 }
 
+                msgLen = dIn.readInt();
+                numPacks = msgLen / 800 + 1;
+                int currAck = 0;
+                byte[] msg = new byte[msgLen];
+                while (currAck < numPacks) {
+                    int off = currAck * 800;
+                    int tmp = dIn.read(msg, off, Math.min(800, msgLen - off));
+                    if (tmp == Math.min(msgLen - off, 800)) {
+                        currAck++;
+                    }
+                    dOut.writeInt(currAck);
+                } //msg should have been received now
+                DataInputStream bIn = new DataInputStream(new ByteArrayInputStream(msg));
 
+                dOut.write("ack".getBytes());
 
+                int numCapacityUpdates = bIn.readInt();
+
+                ArrayList<ProductCapacityPair> capUpdates = new ArrayList<ProductCapacityPair>();
+
+                for (int j = 0; j < numCapacityUpdates; j++) {
+                    byte[] buf = new byte[30];
+                    bIn.readFully(buf);
+                    String pId = new String(buf);
+                    int cap = bIn.readInt();
+                    capUpdates.add(new ProductCapacityPair(pId, cap));
+                }
+
+                int numProductsAdd = bIn.readInt();
+
+                ArrayList<Product> productsToPush = new ArrayList<Product>();
+                ArrayList<byte[]> images = new ArrayList<byte[]>();
+
+                for (int j = 0; j < numProductsAdd; j++) {
+                    Product p = new Product();
+                    byte [] buf = new byte[30]; //id length
+                    bIn.readFully(buf);
+                    p.setId(new String(buf));
+                    int len = bIn.readInt();
+                    buf = new byte[len];
+                    bIn.readFully(buf);
+                    p.setName(new String(buf));
+                    buf = new byte[30]; //fridge id
+                    bIn.readFully(buf);
+                    p.setFridgeID(new String(buf));
+                    len = bIn.readInt();
+                    if (len == -1) {
+                        p.setDescription("");
+                    } else {
+                        buf = new byte[len];
+                        bIn.readFully(buf);
+                        p.setDescription(new String(buf));
+                    }
+                    len = bIn.readInt(); //read capacity
+                    p.setCapacity(len);
+                    len = bIn.readInt(); //read length of expDate
+                    buf = new byte[len];
+                    bIn.readFully(buf); //read expdate
+                    p.setExpirationDate(df.parse(new String(buf)));
+                    len = bIn.readInt(); //read length of date added
+                    buf = new byte[len];
+                    bIn.readFully(buf);
+                    p.setDateAdded(df.parse(new String(buf)));
+                    len = bIn.readInt(); //read length of image
+                    if (len == -1) {
+                        buf = null;
+                    } else {
+                        buf = new byte[len];
+                        bIn.readFully(buf);
+                    }
+                    images.add(buf); //insert image into image list
+                    len = bIn.readInt();
+                    p.setIsCapacity(len == 1);
+                    productsToPush.add(p);
+                }
+
+                int numProductsDelete = bIn.readInt();
+
+                ArrayList<String> productsToDelete = new ArrayList<String>();
+
+                for (int j = 0; j < numProductsDelete; j++) {
+                    byte[] buf = new byte[30];
+                    bIn.readFully(buf);
+                    productsToDelete.add(new String(buf));
+                }
+
+                parent.runOnUiThread(new RunFridgePullUpdate(parent, capUpdates, productsToPush, images, productsToDelete));
             }
+
 
 
         } catch (Exception e) {
@@ -963,6 +1048,45 @@ class SyncFridgesThread implements Runnable {
                 }
             });
         }
+    }
+}
+
+class RunFridgePullUpdate implements Runnable {
+
+    ConnectionActivity theAct;
+    ArrayList<ProductCapacityPair> productsToUpdate;
+    ArrayList<Product> products;
+    ArrayList<byte[]> images;
+    ArrayList<String> toDelete;
+
+
+    public RunFridgePullUpdate(ConnectionActivity a, ArrayList<ProductCapacityPair> upd, ArrayList<Product> newStuff, ArrayList<byte[]> imgs, ArrayList<String> td) {
+        theAct = a;
+        productsToUpdate = upd;
+        products = newStuff;
+        images = imgs;
+        toDelete = td;
+    }
+
+    @Override
+    public void run() {
+
+        theAct.setStatusText("Sync successful");
+        DbHelper dbHelp = new DbHelper(theAct);
+
+        for (int i = 0; i < productsToUpdate.size(); i++) {
+            dbHelp.syncUpdateFullness(productsToUpdate.get(i).prodID, productsToUpdate.get(i).capacity);
+        }
+
+        for (int i = 0; i < products.size(); i++) {
+            dbHelp.insertProductFromSync(products.get(i), images.get(i));
+        }
+
+        for (int i = 0; i < toDelete.size(); i++) {
+            dbHelp.syncDeleteItem(toDelete.get(i));
+        }
+
+
     }
 }
 
