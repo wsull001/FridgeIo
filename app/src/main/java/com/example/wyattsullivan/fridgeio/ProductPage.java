@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -26,17 +27,32 @@ public class ProductPage extends AppCompatActivity {
     private TextView addDate;
     private Button deleteButton;
     private EditText quantity;
+    private NumberPicker numberPicker;
 
     private void setUpCapacity() {
         if (theProduct.isCapacity()) {
             quantity.setVisibility(View.INVISIBLE);
+            findViewById(R.id.numberPicker).setVisibility(View.INVISIBLE);
         } else {
             findViewById(R.id.capacitySeekBar).setVisibility(View.INVISIBLE);
             findViewById(R.id.textView6).setVisibility(View.INVISIBLE);
             ((TextView)findViewById(R.id.textView7)).setText("Quantity");
             findViewById(R.id.textView8).setVisibility(View.INVISIBLE);
-            quantity.setText("" + theProduct.getCapacity());
-            quantity.clearFocus();
+            findViewById(R.id.quantityValue).setVisibility(View.INVISIBLE);
+            numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
+            numberPicker.setMaxValue(99);
+            numberPicker.setMinValue(0);
+            numberPicker.setValue(theProduct.getCapacity());
+            numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                @Override
+                public void onValueChange(NumberPicker numberPicker, int oldVal, int newVal) {
+                    theProduct.setCapacity(newVal);
+                    dbHelper.updateProductFullness(theProduct.getId(), newVal, theProduct.getFridgeID());
+                }
+            });
+            numberPicker.clearFocus();
+            //quantity.setText("" + theProduct.getCapacity());
+            //quantity.clearFocus();
         }
     }
 

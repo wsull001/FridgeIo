@@ -158,4 +158,16 @@
         app:layout_constraintStart_toEndOf="@+id/productPageImageView"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
+    <NumberPicker
+        android:id="@+id/numberPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleY="1"
+        android:scaleX="1.2"
+        android:orientation="vertical"
+        android:focusable="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/productPageImageView"
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
 </android.support.constraint.ConstraintLayout>
