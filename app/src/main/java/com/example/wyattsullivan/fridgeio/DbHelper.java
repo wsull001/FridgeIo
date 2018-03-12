@@ -3,18 +3,15 @@ package com.example.wyattsullivan.fridgeio;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.widget.Toast;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by wyattsullivan on 1/29/18.
@@ -43,6 +40,23 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
     }
 
+    ArrayList<UpdateTriplet> getFridgeUpdates(String fid) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT U.type, U.updateID, U.prodID FROM ToUpdate U WHERE U.fridgeID = '" + fid + "'", null);
+        ArrayList<UpdateTriplet> ret = new ArrayList<UpdateTriplet>();
+
+        for (int i = 0; i < curs.getCount(); i++) {
+            curs.moveToNext();
+
+            ret.add(new UpdateTriplet(curs.getInt(0), curs.getInt(1), curs.getString(2)));
+        }
+
+        return ret;
+    }
+
+
+
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         //create the ProductList
@@ -56,7 +70,8 @@ public class DbHelper extends SQLiteOpenHelper {
         //1-new, 2-delete, 3-updated
         db.execSQL("CREATE TABLE IF NOT EXISTS ToUpdate (updateID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                          "type INTEGER, " +
-                                                         "prodID CHAR(30))");
+                                                         "prodID CHAR(30), " +
+                                                         "fridgeID CHAR(30))");
         db.execSQL("CREATE TABLE IF NOT EXISTS GroceryList (grocID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                             "name TEXT, " +
                                                             "quantity INTEGER, " +
@@ -155,7 +170,7 @@ public class DbHelper extends SQLiteOpenHelper {
         return (result != -1);
     }
 
-    public boolean createUpdate(String pID, int type) {
+    public boolean createUpdate(String pID, int type, String fID) {
         SQLiteDatabase db = getWritableDatabase();
 
         Cursor curs = db.rawQuery("SELECT type, updateID FROM ToUpdate WHERE prodID = '" + pID + "'", null);
@@ -174,6 +189,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 if (type == 2) { //change from update to delete record
                     ContentValues cv = new ContentValues();
                     cv.put("type", type);
+
                     long result = db.update("ToUpdate", cv, "updateID = " + curID, null);
                     return (result != -1);
                 }
@@ -186,6 +202,7 @@ public class DbHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put("type", type);
         cv.put("prodID", pID);
+        cv.put("fridgeID", fID);
         long result = db.insert("ToUpdate", null, cv);
 
         return (result != -1);
@@ -221,7 +238,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
         if (isHosted(prod.getFridgeID())) {
-            createUpdate(key, 1); //create a new item update
+            createUpdate(key, 1, prod.getFridgeID()); //create a new item update
         }
 
         if (result == -1)
@@ -236,7 +253,8 @@ public class DbHelper extends SQLiteOpenHelper {
         int res = db.delete("ProductList", "prodID = '" + id + "'", null);
 
         if (isHosted(fid)) {
-            createUpdate(id, 2); //delete
+            Log.d("Database", "Deleting product on hosted fridge");
+            createUpdate(id, 2, fid); //delete
         }
 
         return (res > 0);
@@ -254,7 +272,7 @@ public class DbHelper extends SQLiteOpenHelper {
         long result = db.update("ProductList", cv, "prodID = '" + id + "'", null);
 
         if (isHosted(fid)) {
-            createUpdate(id, 3); //capacity update
+            createUpdate(id, 3, fid); //capacity update
         }
 
 
@@ -460,6 +478,25 @@ public class DbHelper extends SQLiteOpenHelper {
 
         long result = db.delete("GroceryList", "grocID = " + id, null);
         return (result != -1);
+    }
+
+    public ProductCapacityPair getProductCapacityPair(String id) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cur = db.rawQuery("SELECT P.prodID, P.fullness FROM ProductList P WHERE P.prodID = '" + id + "'", null);
+        if (cur.getCount() <= 0) return null;
+        cur.moveToNext();
+        return new ProductCapacityPair(cur.getString(0), cur.getInt(1));
+    }
+
+    public ArrayList<ProductCapacityPair> getFridgeItemCapacities(String fid) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor curs = db.rawQuery("SELECT P.prodID, P.fullness FROM ProductList P WHERE P.FridgeID = '" + fid + "'",null);
+        ArrayList<ProductCapacityPair> ret = new ArrayList<ProductCapacityPair>();
+        for (int i = 0; i < curs.getCount(); i++) {
+            curs.moveToNext();
+            ret.add(new ProductCapacityPair(curs.getString(0), curs.getInt(1)));
+        }
+        return ret;
     }
 
     @Override

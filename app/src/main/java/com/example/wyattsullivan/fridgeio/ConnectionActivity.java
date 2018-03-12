@@ -18,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -73,6 +75,7 @@ public class ConnectionActivity extends AppCompatActivity {
     public boolean isRunningConnection;
     Button pushFridge;
     Button getFridge;
+    Button syncFridges;
     public BluetoothDevice device;
 
 
@@ -139,7 +142,21 @@ public class ConnectionActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!isRunningConnection) {
                     isRunningConnection = true;
-                    new Thread(new GetHostedFridges(ConnectionActivity.this, device)).start();
+                    new Thread(new GetHostedFridges(ConnectionActivity.this, device, 1)).start();
+                } else {
+                    Toast.makeText(ConnectionActivity.this, "Wait for the current task to finish", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        syncFridges = (Button) findViewById(R.id.connectSync);
+
+        syncFridges.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isRunningConnection) {
+                    isRunningConnection = true;
+                    new Thread(new GetHostedFridges(ConnectionActivity.this, device, 2)).start();
                 } else {
                     Toast.makeText(ConnectionActivity.this, "Wait for the current task to finish", Toast.LENGTH_SHORT).show();
                 }
@@ -181,6 +198,7 @@ public class ConnectionActivity extends AppCompatActivity {
     public void installFridge(String fid, String name, ArrayList<Product> prods, ArrayList<byte[]> imags) {
         DbHelper dbHelp = new DbHelper(this);
         dbHelp.createFridgeFromSync(name, fid);
+        dbHelp.createNotification(fid);
         dbHelp.setIsHosted(fid, true);
         for (int i = 0; i < prods.size(); i++) {
             dbHelp.insertProductFromSync(prods.get(i), imags.get(i));
@@ -415,10 +433,12 @@ class GetHostedFridges implements Runnable {
 
     BluetoothDevice dev;
     ConnectionActivity parent;
+    int option;
 
-    public GetHostedFridges(ConnectionActivity p, BluetoothDevice d) {
+    public GetHostedFridges(ConnectionActivity p, BluetoothDevice d, int opt) {
         parent = p;
         dev = d;
+        option = opt;
     }
 
     @Override
@@ -447,7 +467,11 @@ class GetHostedFridges implements Runnable {
 
             DataOutputStream dOut = new DataOutputStream(s.getOutputStream());
             DataInputStream dIn = new DataInputStream(s.getInputStream());
-            dOut.write("01".getBytes());
+            if (option == 1) {
+                dOut.write("01".getBytes());
+            } else if (option == 2) {
+                dOut.write("03".getBytes());
+            }
             int msgLen = dIn.readInt();
             int numPacks = msgLen / 800 + 1;
             int currAck = 0;
@@ -486,9 +510,12 @@ class GetHostedFridges implements Runnable {
             } else {
                 dOut.write("err".getBytes());
             }
-
-            parent.runOnUiThread(new DisplayFridgesRunner(parent, fl));
-            s.close();
+            if (option == 1) {
+                parent.runOnUiThread(new DisplayFridgesRunner(parent, fl));
+                s.close();
+            } else if (option == 2) {
+                parent.runOnUiThread(new CheckFridgesHad(fl, s, parent));
+            }
 
         } catch (Exception e) {
             Log.e("Bluetooth", "Failed to get fridges", e);
@@ -697,3 +724,245 @@ class InsertFridgeRun implements Runnable {
         act.installFridge(fID, fName, products, images);
     }
 }
+
+class CheckFridgesHad implements Runnable {
+    FridgeList list;
+    BluetoothSocket socket;
+    ConnectionActivity theActivity;
+    public CheckFridgesHad(FridgeList l, BluetoothSocket s, ConnectionActivity act) {
+        list = l;
+        socket = s;
+        theActivity = act;
+    }
+
+    @Override
+    public void run() {
+        DbHelper dbHelp = new DbHelper(theActivity);
+
+        theActivity.setStatusText("Preparing updates");
+        ArrayList<String> fridges = new ArrayList<String>();
+        for (int i = 0; i < list.getSize(); i++) {
+            if (dbHelp.hasFridge(list.getIds()[i])) {
+                fridges.add(list.getIds()[i]);
+            }
+        }
+
+        if (fridges.size() == 0) {
+            theActivity.notifyCompleted();
+        }
+
+        //initialize different parts of the sync
+        ArrayList<ArrayList<String>> toDelete = new ArrayList<ArrayList<String>>(); //keep track of all deletes per fridge
+        ArrayList<ArrayList<Product>> toAdd = new ArrayList<ArrayList<Product>>(); //keep track of all new prods per fridge
+        ArrayList<ArrayList<ProductCapacityPair>> toUpdate = new ArrayList<ArrayList<ProductCapacityPair>>(); //keep track of all updates
+        ArrayList<ArrayList<ProductCapacityPair>> allFridgeProducts = new ArrayList<ArrayList<ProductCapacityPair>>();
+
+        for (int i = 0; i < fridges.size(); i++) { //for each of the fridges, prepare update tables
+            ArrayList<String> curDel = new ArrayList<String>();
+            ArrayList<Product> curAdd = new ArrayList<Product>();
+            ArrayList<ProductCapacityPair> curCapUpdate = new ArrayList<ProductCapacityPair>();
+            ArrayList<ProductCapacityPair> curFridgeProducts = dbHelp.getFridgeItemCapacities(fridges.get(i));
+
+            ArrayList<UpdateTriplet> curUpdates = dbHelp.getFridgeUpdates(fridges.get(i));
+            for (int j = 0; j < curUpdates.size(); j++) {
+                if (curUpdates.get(j).getType() == 2) {
+                    curDel.add(curUpdates.get(j).getProductID());
+                } else if (curUpdates.get(j).getType() == 1) {
+                    curAdd.add(dbHelp.getProductById(curUpdates.get(j).getProductID()));
+                } else if (curUpdates.get(j).getType() == 3) {
+                    curCapUpdate.add(dbHelp.getProductCapacityPair(curUpdates.get(j).getProductID()));
+                }
+                dbHelp.resolveUpdate(curUpdates.get(j).getUpdateID());
+            }
+            toDelete.add(curDel);
+            toAdd.add(curAdd);
+            toUpdate.add(curCapUpdate);
+            allFridgeProducts.add(curFridgeProducts);
+        }
+        for (int i = 0; i < fridges.size(); i++) {
+            Log.d("Bluetooth", "Fridge: " + fridges.get(i) + "   Num Deletes: " + toDelete.get(i).size() + "   Num adds: " + toAdd.get(i).size() + "   Num updates: " + toUpdate.get(i).size());
+        }
+
+        new Thread(new SyncFridgesThread(toDelete, toAdd, toUpdate, allFridgeProducts, fridges,theActivity, socket)).start();
+
+
+
+    }
+}
+
+class SyncFridgesThread implements Runnable {
+
+
+    ArrayList<ArrayList<String>> allItemsToDelete;
+    ArrayList<ArrayList<Product>> allItemsToAdd;
+    ArrayList<ArrayList<ProductCapacityPair>> allCapacitiesToUpdate;
+    ArrayList<ArrayList<ProductCapacityPair>> allItems;
+    ArrayList<String> fridges;
+    ConnectionActivity parent;
+    BluetoothSocket socket;
+
+    public SyncFridgesThread(ArrayList<ArrayList<String>> del, ArrayList<ArrayList<Product>> add,
+                             ArrayList<ArrayList<ProductCapacityPair>> capUpdates,
+                             ArrayList<ArrayList<ProductCapacityPair>> items,
+                             ArrayList<String> fs,
+                             ConnectionActivity p, BluetoothSocket s) {
+        allItemsToDelete = del;
+        allItemsToAdd = add;
+        allCapacitiesToUpdate = capUpdates;
+        fridges = fs;
+        allItems = items;
+        parent = p;
+        socket = s;
+    }
+
+
+
+    @Override
+    public void run() {
+        try {
+
+            DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dIn = new DataInputStream(socket.getInputStream());
+
+            dOut.writeInt(fridges.size()); //write number of fridges to
+
+            for (int i = 0; i < fridges.size(); i++) {
+                dOut.write(fridges.get(0).getBytes()); // write first fridge id
+
+                ByteArrayOutputStream msgOut = new ByteArrayOutputStream();
+                DataOutputStream dataMsgOut = new DataOutputStream(msgOut); //send items to delete followed by items to add
+                                                                            // followed by items to update capacity
+                                                                            //followed by all items
+                ArrayList<String> toDelete = allItemsToDelete.get(i);
+                ArrayList<Product> toAdd = allItemsToAdd.get(i);
+                ArrayList<ProductCapacityPair> toUpdCapacity = allCapacitiesToUpdate.get(i);
+                ArrayList<ProductCapacityPair> fridgeItems = allItems.get(i);
+
+
+                //Write products to delete
+                dataMsgOut.writeInt(toDelete.size());
+
+                for (int j = 0; j < toDelete.size(); j++) {
+                    dataMsgOut.write(toDelete.get(j).getBytes()); //write the product ids sequentially
+                }
+
+                dataMsgOut.write("end".getBytes());
+
+
+
+                //Write products to add
+                dataMsgOut.writeInt(toAdd.size());
+
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+                for (int j = 0; j < toAdd.size(); j++) {
+                    Product p = toAdd.get(j);
+                    dataMsgOut.write(p.getId().getBytes()); //prodID
+                    dataMsgOut.writeInt(p.getName().length()); //prodName length
+                    dataMsgOut.write(p.getName().getBytes()); //prodName
+                    dataMsgOut.write(p.getFridgeID().getBytes()); //fridgeID
+                    if (p.getDesc() != null) {
+                        dataMsgOut.writeInt(p.getDesc().length()); //prodDesc length
+                        dataMsgOut.write(p.getDesc().getBytes()); //prodDesc
+                    } else {
+                        dataMsgOut.writeInt(-1);
+                    }
+                    dataMsgOut.writeInt(p.getCapacity()); //item capacity
+                    String tmp = df.format(p.getExpDate());
+                    dataMsgOut.writeInt(tmp.length());
+                    dataMsgOut.write(tmp.getBytes()); //write exp date
+                    tmp = df.format(p.getDateAdded());
+                    dataMsgOut.writeInt(tmp.length());
+                    dataMsgOut.write(tmp.getBytes());
+                    if (p.getImage() == null) { //write Image
+                        dataMsgOut.writeInt(-1);
+                    } else {
+                        byte[] buf = DbHelper.bitmapToBytes(p.getImage());
+                        dataMsgOut.writeInt(buf.length);
+                        dataMsgOut.write(buf);
+                    }
+                    dataMsgOut.writeInt((p.isCapacity() ? 1 : 0)); //write isCapacity as int
+
+                }
+
+                dataMsgOut.write("end".getBytes());
+
+
+
+                //Write products to update capacity on
+                dataMsgOut.writeInt(toUpdCapacity.size());
+
+                for (int j = 0; j < toUpdCapacity.size(); j++) { //write id followed by capacity
+                    dataMsgOut.write(toUpdCapacity.get(j).prodID.getBytes());
+                    dataMsgOut.writeInt(toUpdCapacity.get(j).capacity);
+                }
+
+                dataMsgOut.write("end".getBytes());
+
+
+                //write all products and capacities to
+                dataMsgOut.writeInt(fridgeItems.size());
+
+                for (int j = 0; j < fridgeItems.size(); j++) { //write id followed by capacity
+                    dataMsgOut.write(fridgeItems.get(j).prodID.getBytes());
+                    dataMsgOut.writeInt(fridgeItems.get(j).capacity);
+                }
+
+                dataMsgOut.write("end".getBytes()); //make sure end is reached successfully for ack response
+
+                byte[] theMsg = msgOut.toByteArray();
+
+                int msgLen = theMsg.length;
+
+                int numPacks = theMsg.length / 800 + 1;
+                int curSeq = 0;
+
+                dOut.writeInt(msgLen);
+                Log.d("Bluetooth", "Msg Length: " + msgLen);
+                while (curSeq < numPacks) {
+                    parent.runOnUiThread(new PercentageRun(curSeq, numPacks, parent, "Sending updates to fridge " + (i+1) + "/" + fridges.size()));
+                    int off = curSeq * 800;
+                    int len = Math.min(msgLen - off, 800);
+                    dOut.write(theMsg, off, len);
+                    int tmpAck = dIn.readInt();
+                    if (tmpAck > curSeq) {
+                        curSeq = tmpAck;
+                    }
+                }
+
+                byte[] ack = new byte[3];
+
+                dIn.readFully(ack);
+
+                if (new String(ack).equals("ack")) {
+                    Log.d("Bluetooth", "Sent successfully");
+                }
+
+
+
+            }
+
+
+        } catch (Exception e) {
+            parent.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    parent.setStatusText("Error: unable to finish syncing all products");
+                }
+            });
+        } finally {
+            try {
+                Thread.sleep(2000);
+                socket.close();
+            } catch(Exception e) {}
+
+            parent.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    parent.notifyCompleted();
+                }
+            });
+        }
+    }
+}
+

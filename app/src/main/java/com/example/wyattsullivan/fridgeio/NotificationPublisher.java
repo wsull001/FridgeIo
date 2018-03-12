@@ -58,25 +58,27 @@ public class NotificationPublisher extends BroadcastReceiver {
         //Get a count of how many products user has going to expire
         ArrayList<Product> prods = dbHelp.getProductsByExpDate(fridgeID);
         int count = 0;
-        for (int i = 0; i < prods.size(); ++i) {
-            Calendar exp = new GregorianCalendar();
-            exp.setTime(prods.get(i).getExpDate());
-            Calendar current = Calendar.getInstance();
-            switch (notif.getFrequency()){
-                case 1:
-                    current.add(Calendar.DATE,1);
+        if (prods != null) {
+            for (int i = 0; i < prods.size(); ++i) {
+                Calendar exp = new GregorianCalendar();
+                exp.setTime(prods.get(i).getExpDate());
+                Calendar current = Calendar.getInstance();
+                switch (notif.getFrequency()) {
+                    case 1:
+                        current.add(Calendar.DATE, 1);
+                        break;
+                    case 2:
+                        current.add(Calendar.DATE, 3);
+                        break;
+                    case 3:
+                        current.add(Calendar.DATE, 7);
+                        break;
+                }
+                if (current.after(exp)) {
+                    ++count;
+                } else {
                     break;
-                case 2:
-                    current.add(Calendar.DATE, 3);
-                    break;
-                case 3:
-                    current.add(Calendar.DATE, 7);
-                    break;
-            }
-            if (current.after(exp)) {
-                ++count;
-            } else {
-                break;
+                }
             }
         }
 
