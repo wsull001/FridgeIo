@@ -827,7 +827,7 @@ class SyncFridgesThread implements Runnable {
             dOut.writeInt(fridges.size()); //write number of fridges to
 
             for (int i = 0; i < fridges.size(); i++) {
-                dOut.write(fridges.get(0).getBytes()); // write first fridge id
+                dOut.write(fridges.get(i).getBytes());
 
                 ByteArrayOutputStream msgOut = new ByteArrayOutputStream();
                 DataOutputStream dataMsgOut = new DataOutputStream(msgOut); //send items to delete followed by items to add
